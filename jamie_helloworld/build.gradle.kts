@@ -29,6 +29,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
 }
 
+// Alias "installDist" as "stage" (for cloud providers)
 tasks.create("stage") {
-    dependsOn("installDist")
+    dependsOn(tasks.getByName("installDist"))
 }
+
