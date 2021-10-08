@@ -1,1 +1,1 @@
-web: ./build/install/ibn/com.example.ktor-sample
+web: ./build/install/bin/com.example.ktor-sample
