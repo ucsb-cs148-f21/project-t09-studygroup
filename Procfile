@@ -1,1 +1,1 @@
-web: ./build/scripts/com.example.ktor-sample
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/com.example.ktor-sample-0.0.1.jar
