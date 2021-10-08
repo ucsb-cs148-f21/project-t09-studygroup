@@ -30,7 +30,7 @@ dependencies {
 }
 
 tasks.create("stage") {
-    dependsOn("installDist")
+    dependsOn(tasks.getByName("installDist"))
 }
 // Alias "installDist" as "stage" (for cloud providers)
 tasks.create("stage") {
