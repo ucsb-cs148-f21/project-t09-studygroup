@@ -11,3 +11,5 @@ We stategically pair throughout assigning to an issue on Kanban board.
 
 # What are the most signficant gaps in your team’s knowledge?
 The most significant gaps in our team's knowledge is accessing and utilizing the UCSB API.
+
+Joshua Avery - learn and choose messaging API for this week (week 3), and implement it into our MVP (week 4).
