@@ -16,5 +16,5 @@ The most significant gaps in our team's knowledge is accessing and utilizing the
 Joshua Avery - learn and choose messaging API for this week (week 3), and implement it into our MVP (week 4).\
 Kenneth Wang - By this week (week 3), I will learn how to access the UCSB API. By next week (week 4), I will learn how to implement the API into our MVP\
 Jamie Wang - My plan will be similar to Josh’s and I will also dig deeper into the tutorials of vue and HTML.\
-Jennice Xu - My plain for this week (week 3) will be learn more about accessing UCSB API and the Vue.js tutorials. I will learn how to implement API for the next week (week 4).、
+Jennice Xu - My plain for this week (week 3) will be learn more about accessing UCSB API and the Vue.js tutorials. I will learn how to implement API for the next week (week 4).\
 Anisha Kabir - My plan is to go through the Vue.js tutorials and get familiar with the framework.
