@@ -11,6 +11,8 @@ Kenneth Wang kenny-wang6
 
 Zhenni Xu larkJennice
 
+Tech Stack: Vue, Fastapi, MongoDB
+
 
 Professor
 - Manage their class
