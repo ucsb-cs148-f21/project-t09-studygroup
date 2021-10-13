@@ -36,3 +36,6 @@ Administrator
 - Delete classes if necessary
 - Moderate study group chats
 - Create classes if necessary
+
+
+We will restrict the userbase to @ucsb.edu
