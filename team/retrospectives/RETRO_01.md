@@ -14,11 +14,11 @@
 
 Start:
 - Communicating the progress we've made and giving updates outside of class time through Slack.
-- Start separating our backend and front end into different repos, so that it is easier to keep track of the two or at least different folders.
-- Thinking about what features should we include in the MVP
-- Thinking about a process for how our github workflow will work
-  - feauture branches from main, add code to branch, once done testing merge main branch back into the feauture branch, then make pull request for feauture branch into main 
-- We should think about building up a basic MVP setting
+- Start separating our backend and front end into different folders so that it is easier to keep track.
+- Thinking about what features should we include in the MVP.
+- Thinking about a process for how our github workflow will work.
+  - Feauture branches from main, add code to branch, once done testing merge main branch back into the feauture branch, then make pull request for feauture branch into main.
+- We should think about building up a basic MVP setting.
 
 Stop: 
 - Recording the meetings in the wrong format.
