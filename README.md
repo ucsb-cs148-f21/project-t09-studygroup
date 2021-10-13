@@ -11,7 +11,7 @@ Kenneth Wang kenny-wang6
 
 Zhenni Xu larkJennice
 
-Tech Stack: Vue, Fastapi, MongoDB
+Our tech stack will be vue, mongodb, and fastapi. Joshua is familiar with using these three technologies in concert. Vue is very quick to use and has the amazing 'bootstrap vue' library which comes with great UI components. Fastapi is a python library. Most of the group is familiar with Python.
 
 
 Professor
