@@ -32,12 +32,15 @@ Continue:
 
 ## Retro Assessment
 
-* A brief description of what retro outline or process you used.
-We used the start/stop/continue method for our team retro. We each came up with ideas for each category and took time to discuss each point that was brought up.
+A brief description of what retro outline or process you used.
 
-* A brief assessment of how it went.
-We were able to generate a lot of ideas that help us both with our team communication and our project workflow. Each team member participated and presented their ideas. 
+* We used the start/stop/continue method for our team retro. We each came up with ideas for each category and took time to discuss each point that was brought up.
 
-* What advice would you give to the next person leading a retro based on what you learned today?
-I would advise the next person leading a retro to make sure to get feedback from the group as the retro is happening, making sure that everyone is on the smae page and knows what is being discussed.
+A brief assessment of how it went.
+
+* We were able to generate a lot of ideas that help us both with our team communication and our project workflow. Each team member participated and presented their ideas. 
+
+What advice would you give to the next person leading a retro based on what you learned today?
+
+* I would advise the next person leading a retro to make sure to get feedback from the group as the retro is happening, making sure that everyone is on the smae page and knows what is being discussed.
   
