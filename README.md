@@ -13,6 +13,8 @@ Zhenni Xu larkJennice
 
 Our tech stack will be vue, mongodb, and fastapi. Joshua is familiar with using these three technologies in concert. Vue is very quick to use and has the amazing 'bootstrap vue' library which comes with great UI components. Fastapi is a python library. Most of the group is familiar with Python.
 
+Our project is meant to make it easy for people to find the same classes and then communicate with people in those classes. We will have a central repository through which people can search for classes and the join. People should be able to chat with others. Professors can claim the class if they want so they can also communicate with their students. Finally TAs should be able to join as well.
+
 
 Professor
 - Manage their class
