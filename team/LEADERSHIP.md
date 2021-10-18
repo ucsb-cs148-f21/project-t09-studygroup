@@ -7,4 +7,6 @@
 | Mon 10/06 | Josuhua Avery     | Daily Scrum                                            | 
 | Fri 10/08 | Kenneth Wang      | Daily Scrum                                            |
 | Mon 10/11 | Kenneth Wang      | User Stories and First Spring Planning                                  | 
-| Wed 10/13 | Anisha Kabir     | Retro                                        | 
+| Wed 10/13 | Anisha Kabir      | lead the retro                                        | 
+| Sun 10/17 | Joshua Avery      | Lead the sprint planning meeting |
+
