@@ -18,3 +18,6 @@ Kenneth Wang - By this week (week 3), I will learn how to access the UCSB API. B
 Jamie Wang - My plan will be similar to Josh’s and I will also dig deeper into the tutorials of vue and HTML.\
 Jennice Xu - My plain for this week (week 3) will be learn more about accessing UCSB API and the Vue.js tutorials. I will learn how to implement API for the next week (week 4).\
 Anisha Kabir - My plan is to go through the Vue.js tutorials and get familiar with the framework.
+
+# Articles posting
+Jamie Wang - I posted https://vuejs.org/v2/guide/installation.html and https://github.com/antoine92190/vue-advanced-chat in frontend_articles and commented under https://www.youtube.com/watch?v=W6NZfCO5SIk in the channel js_articles. 
