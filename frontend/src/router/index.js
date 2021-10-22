@@ -24,6 +24,11 @@ const routes = [
     name: 'Class',
     component: Class,
   },
+  {
+    path: '/adminpanel',
+    name: 'Admin',
+    component: Admin,
+  },
 ];
 
 const router = new VueRouter({
