@@ -44,3 +44,5 @@ What advice would you give to the next person leading a retro based on what you 
 
 * I would advise the next person leading a retro to make sure to get feedback from the group as the retro is happening, making sure that everyone is on the smae page and knows what is being discussed.
   
+## Outcome of Retro Experiment
+Our measurement was to monitor the amount of pull requests we are able to complete and reflect on our progess. We were able to complete two pull requests so far this past week that moved us closer to our goals. Additionally, through commincation on slack and reflection in person we were able to better monitor our progress.
