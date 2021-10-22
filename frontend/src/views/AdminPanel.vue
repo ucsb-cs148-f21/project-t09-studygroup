@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>The greatest news app ever</title>
-  </head>
-  <body>
-    <div class="container" id="app">
-      <h3 class="text-center">VueNews</h3> 
-    </div>
-  </body>
-</html>
+<template>
+  <div class="adminpanel">
+    <h1>Admin Panel</h1>
+    <b-button block variant="primary">Refresh Quarter
+        <b-button
+            @click.native="getCourses(quarter)"
+            variant="primary">
+        </b-button>
+    </b-button>
+  </div>
+</template>
