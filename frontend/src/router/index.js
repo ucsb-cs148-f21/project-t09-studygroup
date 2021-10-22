@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import Class from '../views/Class.vue';
+import AdminPanel from '../views/AdminPanel.vue';
 
 Vue.use(VueRouter);
 
@@ -27,7 +28,7 @@ const routes = [
   {
     path: '/adminpanel',
     name: 'Admin',
-    component: Admin,
+    component: AdminPanel,
   },
 ];
 
