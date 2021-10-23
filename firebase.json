@@ -4,6 +4,9 @@
     "indexes": "firestore.indexes.json"
   },
   "emulators": {
+    "functions": {
+      "port": 8082
+    },
     "auth": {
       "port": 9099
     },
