@@ -54,7 +54,7 @@ export default {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         console.log(doc.id, ' => ', doc.data());
-        const courseLink = `http://localhost:8080/class/${doc.id}`;
+        const courseLink = window.location.origin + '/class/' + doc.id;
         console.log(courseLink);
         this.links.push({ message: `<a href='${courseLink}'>${courseLink}</a>` });
       });

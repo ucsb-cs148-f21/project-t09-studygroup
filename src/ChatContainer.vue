@@ -22,13 +22,11 @@
       @send-message="sendMessage"
       @edit-message="editMessage"
       @delete-message="deleteMessage"
-      @open-file="openFile"
       @open-user-tag="openUserTag"
       @add-room="addRoom"
       @room-action-handler="menuActionHandler"
       @menu-action-handler="menuActionHandler"
       @send-message-reaction="sendMessageReaction"
-      @typing-message="typingMessage"
       @toggle-rooms-list="$emit('show-demo-options', $event.opened)"
     >
       <!-- <template #room-header="{ room }">
@@ -460,9 +458,9 @@ export default {
         timestamp: new Date(),
       };
 
-      if (files) {
+      /* if (files) {
         message.files = this.formattedFiles(files);
-      }
+      } */
 
       if (replyMessage) {
         message.replyMessage = {
@@ -471,18 +469,19 @@ export default {
           sender_id: replyMessage.senderId,
         };
 
-        if (replyMessage.files) {
+        /* if (replyMessage.files) {
           message.replyMessage.files = replyMessage.files;
         }
+        */
       }
 
       const { id } = await messagesRef(roomId).add(message);
 
-      if (files) {
+      /* if (files) {
         for (let index = 0; index < files.length; index++) {
           await this.uploadFile({ file: files[index], messageId: id, roomId });
         }
-      }
+      } */
 
       roomsRef.doc(roomId).update({ lastUpdated: new Date() });
     },
@@ -503,13 +502,13 @@ export default {
         .doc(messageId)
         .update(newMessage);
 
-      if (files) {
+      /* if (files) {
         for (let index = 0; index < files.length; index++) {
           if (files[index]?.blob) {
             await this.uploadFile({ file: files[index], messageId, roomId });
           }
         }
-      }
+      } */
     },
 
     async deleteMessage({ message, roomId }) {
