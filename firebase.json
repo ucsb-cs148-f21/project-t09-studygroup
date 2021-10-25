@@ -11,7 +11,7 @@
       "port": 9099
     },
     "firestore": {
-      "port": 8081
+      "port": 2020
     },
     "ui": {
       "enabled": true
