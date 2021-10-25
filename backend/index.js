@@ -9,8 +9,7 @@ import { db } from './firestore.js';
 
 const app = express();
 
-app.use(serveStatic(path.join(path.dirname(''), '../dist')));
-const port = process.env.PORT || 3000;
+
 
 // Automatically allow cross-origin requests
 app.use(cors({ origin: true }));
@@ -42,6 +41,10 @@ app.get('/api/currentQuarter', async (req, res) => {
   res.send({ quarter });
 });
 // app.get()
+
+app.use('/',express.static('./dist'));
+console.log(path.dirname(''))
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => console.log(`Running on port: ${port}`));
 
