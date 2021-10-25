@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { fileURLToPath } from 'url';
 import axios from 'axios';
 import express from 'express';
 import cors from 'cors';
@@ -8,7 +9,7 @@ import path from 'path';
 import { db } from './firestore.js';
 
 const app = express();
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 // Automatically allow cross-origin requests
@@ -42,7 +43,10 @@ app.get('/api/currentQuarter', async (req, res) => {
 });
 // app.get()
 
-app.use('/',express.static('./dist'));
+app.use('/',express.static(path.join(path.dirname(__dirname), '/dist')));
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(path.dirname(__dirname), '/dist/index.html'));
+})
 console.log(path.dirname(''))
 const port = process.env.PORT || 3000;
 
