@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { roomsRef, usersRef } from '@/firestore';
+import { roomsRef, usersRef } from '../firestore';
 import ChatContainer from '../ChatContainer.vue';
 
 export default {
