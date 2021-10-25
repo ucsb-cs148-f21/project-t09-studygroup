@@ -5,7 +5,7 @@
         id="input-group-1"
         label="Course:"
         label-for="input-1"
-        description="Enter the course id you are searching for (e.g. CMPSC 148)"
+        description="Enter the course id you are searching for (e.g. ANTH 3). The id is case-sensitive."
       >
         <b-form-input
           id="input-1"

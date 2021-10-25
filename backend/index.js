@@ -1,14 +1,16 @@
-const functions = require("firebase-functions");
-const axios = require("axios").default;
-const express = require("express");
-const cors = require("cors");
-
+import {v4 as uuidv4} from 'uuid';
+import axios from 'axios';
+import express from 'express';
+import cors from 'cors';
 const app = express();
 
-const admin = require("firebase-admin");
-admin.initializeApp();
-const db = admin.firestore();
+import {db} from './firestore.js';
 
+import serveStatic from "serve-static";
+import path from "path";
+
+app.use(serveStatic(path.join(path.dirname(''), '../frontend/dist')));
+const port = process.env.PORT || 3000;
 
 // Automatically allow cross-origin requests
 app.use(cors({origin: true}));
@@ -23,20 +25,27 @@ app.use(cors({origin: true}));
 // 6. learn how to store that into firebase
 // 7. make the Vue admin button to send request to this add-recent-classes
 
-app.post("/add-recent-classes", async (req, res) => {
+app.post("/api/add-recent-classes", async (req, res) => {
   let quarter = await getMostCurrentQuarter();
   if ((await db.collection(`courses_${quarter}`).limit(1).get()).size !== 1){
   (await getClasses(quarter)).forEach(async (el)=>{
-    await db.collection(`courses_${quarter}`).add(el);
+    let id = uuidv4();
+    el.roomId = id;
+    el.roomName = el.courseID;
+    el.users = ['127.0.0.1']
+    await db.collection(`courses_${quarter}`).doc(id).set(el);
     
   });
 }
   res.sendStatus(200);
 });
+app.get("/api/currentQuarter", async (req, res) => {
+  let quarter = await getMostCurrentQuarter();
+  res.send({quarter});
+});
 // app.get()
 
-// Expose Express API as a single Cloud Function:
-exports.widgets = functions.https.onRequest(app);
+app.listen(port, () => console.log("Running on port: "+port))
 
 async function getMostCurrentQuarter() {
 

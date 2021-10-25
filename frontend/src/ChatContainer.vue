@@ -6,7 +6,7 @@
       :theme="theme"
       :styles="styles"
       :current-user-id="currentUserId"
-      :room-id="enrollCode"
+      :room-id="roomId"
       :rooms="classDoc"
 	  :single-room="true"
       :loading-rooms="loadingRooms"
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { doc, getDoc } from 'firebase/firestore';
 import ChatWindow, { Rooms } from 'vue-advanced-chat';
 import {
@@ -74,7 +75,7 @@ export default {
 
       roomsPerPage: 15,
       rooms: [],
-      enrollCode: '',
+      roomId: '',
       startRooms: null,
       endRooms: null,
       roomsLoaded: false,
@@ -140,24 +141,18 @@ export default {
 
   mounted() {
     this.fetchClassDoc(this.$route.params.id);
-	console.log(this.$route);
+    console.log(this.$route);
     this.updateUserOnlineStatus();
   },
 
   methods: {
     async fetchClassDoc(classId) {
       this.resetRooms();
-      this.classDoc = [(await db.collection('classes').doc(classId).get()).data()];
-	  console.log(this.classDoc);
+      const { quarter } = (await axios.get(`${this.$API_BASE}currentQuarter`)).data;
+      this.classDoc = [(await db.collection(`courses_${quarter}`).doc(classId).get()).data()];
+      console.log(this.classDoc);
+      console.log(this.classDoc);
     },
-
-
-
-
-
-
-
-
 
     resetRooms() {
       this.loadingRooms = true;
@@ -254,7 +249,7 @@ export default {
 
         formattedRooms.push({
           ...room,
-          enrollCode: key,
+          roomId: key,
           avatar: roomAvatar,
           index: room.lastUpdated.seconds,
           lastMessage: {
@@ -281,7 +276,7 @@ export default {
     },
 
     listenLastMessage(room) {
-      const listener = messagesRef(room.enrollCode)
+      const listener = messagesRef(room.roomId)
         .orderBy('timestamp', 'desc')
         .limit(1)
         .onSnapshot((messages) => {
@@ -289,7 +284,7 @@ export default {
           messages.forEach((message) => {
             const lastMessage = this.formatLastMessage(message.data());
             const roomIndex = this.rooms.findIndex(
-              (r) => room.enrollCode === r.enrollCode,
+              (r) => room.roomId === r.roomId,
             );
             this.rooms[roomIndex].lastMessage = lastMessage;
             this.rooms = [...this.rooms];
@@ -344,24 +339,24 @@ export default {
 
       if (options.reset) {
         this.resetMessages();
-        this.enrollCode = room.enrollCode;
+        this.roomId = room.roomId;
       }
 
       if (this.endMessages && !this.startMessages) {
         return (this.messagesLoaded = true);
       }
 
-      const ref = messagesRef(room.enrollCode);
+      const ref = messagesRef(room.roomId);
 
       let query = ref.orderBy('timestamp', 'desc').limit(this.messagesPerPage);
 
       if (this.startMessages) query = query.startAfter(this.startMessages);
 
-      this.selectedRoom = room.enrollCode;
+      this.selectedRoom = room.roomId;
 
       query.get().then((messages) => {
         // this.incrementDbCounter('Fetch Room Messages', messages.size)
-        if (this.selectedRoom !== room.enrollCode) return;
+        if (this.selectedRoom !== room.roomId) return;
 
         if (messages.empty || messages.docs.length < this.messagesPerPage) {
           setTimeout(() => (this.messagesLoaded = true), 0);
@@ -415,7 +410,7 @@ export default {
         message.data().sender_id !== this.currentUserId
         && (!message.data().seen || !message.data().seen[this.currentUserId])
       ) {
-        messagesRef(room.enrollCode)
+        messagesRef(room.roomId)
           .doc(message.id)
           .update({
             [`seen.${this.currentUserId}`]: new Date(),
@@ -457,7 +452,7 @@ export default {
     },
 
     async sendMessage({
-      content, enrollCode, files, replyMessage,
+      content, roomId, files, replyMessage,
     }) {
       const message = {
         sender_id: '127.0.0.1',
@@ -481,19 +476,19 @@ export default {
         }
       }
 
-      const { id } = await messagesRef(enrollCode).add(message);
+      const { id } = await messagesRef(roomId).add(message);
 
       if (files) {
         for (let index = 0; index < files.length; index++) {
-          await this.uploadFile({ file: files[index], messageId: id, enrollCode });
+          await this.uploadFile({ file: files[index], messageId: id, roomId });
         }
       }
 
-      roomsRef.doc(enrollCode).update({ lastUpdated: new Date() });
+      roomsRef.doc(roomId).update({ lastUpdated: new Date() });
     },
 
     async editMessage({
-      messageId, newContent, enrollCode, files,
+      messageId, newContent, roomId, files,
     }) {
       const newMessage = { edited: new Date() };
       newMessage.content = newContent;
@@ -504,21 +499,21 @@ export default {
         newMessage.files = deleteDbField;
       }
 
-      await messagesRef(enrollCode)
+      await messagesRef(roomId)
         .doc(messageId)
         .update(newMessage);
 
       if (files) {
         for (let index = 0; index < files.length; index++) {
           if (files[index]?.blob) {
-            await this.uploadFile({ file: files[index], messageId, enrollCode });
+            await this.uploadFile({ file: files[index], messageId, roomId });
           }
         }
       }
     },
 
-    async deleteMessage({ message, enrollCode }) {
-      await messagesRef(enrollCode)
+    async deleteMessage({ message, roomId }) {
+      await messagesRef(roomId)
         .doc(message._id)
         .update({ deleted: new Date() });
 
@@ -536,7 +531,7 @@ export default {
       }
     },
 
-    async uploadFile({ file, messageId, enrollCode }) {
+    async uploadFile({ file, messageId, roomId }) {
       let type = file.extension || file.type;
       if (type === 'svg' || type === 'pdf') {
         type = file.type;
@@ -550,7 +545,7 @@ export default {
       await uploadFileRef.put(file.blob, { contentType: type });
       const url = await uploadFileRef.getDownloadURL();
 
-      const messageDoc = await messagesRef(enrollCode)
+      const messageDoc = await messagesRef(roomId)
         .doc(messageId)
         .get();
 
@@ -562,7 +557,7 @@ export default {
         }
       });
 
-      await messagesRef(enrollCode)
+      await messagesRef(roomId)
         .doc(messageId)
         .update({ files });
     },
@@ -595,7 +590,7 @@ export default {
     },
 
     async openUserTag({ user }) {
-      let enrollCode;
+      let roomId;
 
       this.rooms.forEach((room) => {
         if (room.users.length === 2) {
@@ -605,12 +600,12 @@ export default {
             (userId1 === user._id || userId1 === this.currentUserId)
             && (userId2 === user._id || userId2 === this.currentUserId)
           ) {
-            enrollCode = room.enrollCode;
+            roomId = room.roomId;
           }
         }
       });
 
-      if (enrollCode) return (this.enrollCode = enrollCode);
+      if (roomId) return (this.roomId = roomId);
 
       const query1 = await roomsRef
         .where('users', '==', [this.currentUserId, user._id])
@@ -633,7 +628,7 @@ export default {
         lastUpdated: new Date(),
       });
 
-      this.enrollCode = room.id;
+      this.roomId = room.id;
       this.fetchRooms();
     },
 
@@ -641,38 +636,38 @@ export default {
       query.forEach(async (room) => {
         if (this.loadingRooms) return;
         await roomsRef.doc(room.id).update({ lastUpdated: new Date() });
-        this.enrollCode = room.id;
+        this.roomId = room.id;
         this.fetchRooms();
       });
     },
 
-    menuActionHandler({ action, enrollCode }) {
+    menuActionHandler({ action, roomId }) {
       switch (action.name) {
         case 'inviteUser':
-          return this.inviteUser(enrollCode);
+          return this.inviteUser(roomId);
         case 'removeUser':
-          return this.removeUser(enrollCode);
+          return this.removeUser(roomId);
         case 'deleteRoom':
-          return this.deleteRoom(enrollCode);
+          return this.deleteRoom(roomId);
       }
     },
 
     async sendMessageReaction({
-      reaction, remove, messageId, enrollCode,
+      reaction, remove, messageId, roomId,
     }) {
       const dbAction = remove
         ? firebase.firestore.FieldValue.arrayRemove(this.currentUserId)
         : firebase.firestore.FieldValue.arrayUnion(this.currentUserId);
 
-      await messagesRef(enrollCode)
+      await messagesRef(roomId)
         .doc(messageId)
         .update({
           [`reactions.${reaction.unicode}`]: dbAction,
         });
     },
 
-    typingMessage({ message, enrollCode }) {
-      if (!enrollCode) return;
+    typingMessage({ message, roomId }) {
+      if (!roomId) return;
 
       if (message?.length > 1) {
         return (this.typingMessageCache = message);
@@ -688,7 +683,7 @@ export default {
         ? firebase.firestore.FieldValue.arrayUnion(this.currentUserId)
         : firebase.firestore.FieldValue.arrayRemove(this.currentUserId);
 
-      roomsRef.doc(enrollCode).update({
+      roomsRef.doc(roomId).update({
         typingUsers: dbAction,
       });
     },
@@ -697,7 +692,7 @@ export default {
       const listener = query.onSnapshot((rooms) => {
         // this.incrementDbCounter('Listen Rooms Typing Users', rooms.size)
         rooms.forEach((room) => {
-          const foundRoom = this.rooms.find((r) => r.enrollCode === room.id);
+          const foundRoom = this.rooms.find((r) => r.roomId === room.id);
           if (foundRoom) {
             foundRoom.typingUsers = room.data().typingUsers;
             foundRoom.index = room.data().lastUpdated.seconds;
@@ -754,7 +749,7 @@ export default {
               user.status = { ...snapshot.val(), lastChanged };
 
               const roomIndex = this.rooms.findIndex(
-                (r) => room.enrollCode === r.enrollCode,
+                (r) => room.roomId === r.roomId,
               );
 
               this.rooms[roomIndex] = room;
@@ -788,9 +783,9 @@ export default {
     },
 
     // change needed
-    inviteUser(enrollCode) {
+    inviteUser(roomId) {
       this.resetForms();
-      this.inviteEnrollCode = enrollCode;
+      this.inviteEnrollCode = roomId;
     },
 
     async addRoomUser() {
@@ -808,10 +803,10 @@ export default {
       this.fetchRooms();
     },
 
-    removeUser(enrollCode) {
+    removeUser(roomId) {
       this.resetForms();
-      this.removeEnrollCode = enrollCode;
-      this.removeUsers = this.rooms.find((room) => room.enrollCode === enrollCode).users;
+      this.removeEnrollCode = roomId;
+      this.removeUsers = this.rooms.find((room) => room.roomId === roomId).users;
     },
 
     async deleteRoomUser() {
@@ -826,8 +821,8 @@ export default {
       this.fetchRooms();
     },
 
-    async deleteRoom(enrollCode) {
-      const room = this.rooms.find((r) => r.enrollCode === enrollCode);
+    async deleteRoom(roomId) {
+      const room = this.rooms.find((r) => r.roomId === roomId);
       if (
         room.users.find((user) => user._id === 'SGmFnBZB4xxMv9V4CVlW')
         || room.users.find((user) => user._id === '6jMsIXUrBHBj7o2cRlau')
@@ -835,14 +830,14 @@ export default {
         return alert('Nope, for demo purposes you cannot delete this room');
       }
 
-      const ref = messagesRef(enrollCode);
+      const ref = messagesRef(roomId);
 
       ref.get().then((res) => {
         if (res.empty) return;
         res.docs.map((doc) => ref.doc(doc.id).delete());
       });
 
-      await roomsRef.doc(enrollCode).delete();
+      await roomsRef.doc(roomId).delete();
 
       this.fetchRooms();
     },

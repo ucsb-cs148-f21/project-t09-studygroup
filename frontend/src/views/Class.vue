@@ -8,18 +8,6 @@
                 <button @click="resetData">Clear Data</button>
                 <button @click="addData" :disabled="updatingData">Add Data</button>
             </div> -->
-            <span
-                v-if="showOptions"
-                class="user-logged"
-                :class="{ 'user-logged-dark': theme === 'dark' }"
-            >
-                Logged as
-            </span>
-            <select v-if="showOptions" v-model="currentUserId">
-                <option v-for="user in users" :key="user._id" :value="user._id">
-                    {{ user.username }}
-                </option>
-            </select>
 
             <div v-if="showOptions" class="button-theme">
                 <button class="button-light" @click="theme = 'light'">

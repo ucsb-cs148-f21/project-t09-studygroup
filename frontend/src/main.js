@@ -10,6 +10,11 @@ Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 
 Vue.config.productionTip = false;
+if (window.location.hostname === 'localhost') {
+  Vue.prototype.$API_BASE = 'http://localhost:3000/api/';
+} else {
+  Vue.prototype.$API_BASE = `${window.location.origin}/api/`;
+}
 
 new Vue({
   router,
