@@ -39,9 +39,6 @@
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-google": "^0.14.0"
   },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
   "type": "module",
   "lint-staged": {
     "*.{js,jsx,vue}": [
