@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { doc, getDoc } from 'firebase/firestore';
 import ChatWindow, { Rooms } from 'vue-advanced-chat';
 import {
@@ -95,9 +96,9 @@ export default {
       disableForm: false,
       addNewRoom: null,
       addRoomUsername: '',
-      inviteRoomId: null,
+      inviteEnrollCode: null,
       invitedUsername: '',
-      removeRoomId: null,
+      removeEnrollCode: null,
       removeUserId: '',
       removeUsers: [],
       roomActions: [
@@ -140,24 +141,18 @@ export default {
 
   mounted() {
     this.fetchClassDoc(this.$route.params.id);
-	console.log(this.$route);
+    console.log(this.$route);
     this.updateUserOnlineStatus();
   },
 
   methods: {
     async fetchClassDoc(classId) {
       this.resetRooms();
-      this.classDoc = [(await db.collection('classes').doc(classId).get()).data()];
-	  console.log(this.classDoc);
+      const { quarter } = (await axios.get(`${this.$API_BASE}currentQuarter`)).data;
+      this.classDoc = [(await db.collection(`courses_${quarter}`).doc(classId).get()).data()];
+      console.log(this.classDoc);
+      console.log(this.classDoc);
     },
-
-
-
-
-
-
-
-
 
     resetRooms() {
       this.loadingRooms = true;
@@ -790,7 +785,7 @@ export default {
     // change needed
     inviteUser(roomId) {
       this.resetForms();
-      this.inviteRoomId = roomId;
+      this.inviteEnrollCode = roomId;
     },
 
     async addRoomUser() {
@@ -800,28 +795,28 @@ export default {
       await usersRef.doc(id).update({ _id: id });
 
       await roomsRef
-        .doc(this.inviteRoomId)
+        .doc(this.inviteEnrollCode)
         .update({ users: firebase.firestore.FieldValue.arrayUnion(id) });
 
-      this.inviteRoomId = null;
+      this.inviteEnrollCode = null;
       this.invitedUsername = '';
       this.fetchRooms();
     },
 
     removeUser(roomId) {
       this.resetForms();
-      this.removeRoomId = roomId;
+      this.removeEnrollCode = roomId;
       this.removeUsers = this.rooms.find((room) => room.roomId === roomId).users;
     },
 
     async deleteRoomUser() {
       this.disableForm = true;
 
-      await roomsRef.doc(this.removeRoomId).update({
+      await roomsRef.doc(this.removeEnrollCode).update({
         users: firebase.firestore.FieldValue.arrayRemove(this.removeUserId),
       });
 
-      this.removeRoomId = null;
+      this.removeEnrollCode = null;
       this.removeUserId = '';
       this.fetchRooms();
     },
@@ -851,9 +846,9 @@ export default {
       this.disableForm = false;
       this.addNewRoom = null;
       this.addRoomUsername = '';
-      this.inviteRoomId = null;
+      this.inviteEnrollCode = null;
       this.invitedUsername = '';
-      this.removeRoomId = null;
+      this.removeEnrollCode = null;
       this.removeUserId = '';
     },
 

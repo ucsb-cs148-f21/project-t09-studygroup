@@ -7,13 +7,14 @@
 </template>
 <script>
 import axios from 'axios';
+
 export default {
   methods: {
-    getClasses(){
-    axios.post('http://localhost:8082/study-group-148/us-central1/widgets/add-recent-classes')
+    getClasses() {
+      console.log(this.$API_BASE);
+      axios.post(`${this.$API_BASE}add-recent-classes`);
     },
   },
 
-}
+};
 </script>
-
