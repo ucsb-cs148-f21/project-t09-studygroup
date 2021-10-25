@@ -41,3 +41,61 @@ Administrator
 
 
 We will restrict the userbase to @ucsb.edu
+
+
+
+# Installation
+Prerequisites
+
+User should have npm, node, and git installed. Do this through nvm (Node Version Manager).
+# Dependencies
+
+axios is a library that makes sending http requests with js easy.
+
+Bootstrap adds nice css styling
+
+Bootstrap vue is the vue specific version of bootstrap. Makes for easy integration of bootstrap into vue apps.
+
+cors is a middleware for express that allows cross origin requests.
+
+express is a framework for making web servers with nodejs
+
+firebase allows us to communicate with the google firebase database.
+
+uuid alloows us to generate uuids
+
+vue is a frontend library for making web pages/apps
+
+vue-advanced-chat is a vue library which implements a chat room
+
+vue-router is meant to allow vue to programmatically manipulate the browser url
+
+vuex is meant for storing state in vue
+
+Eslint allows for checking of style in code
+
+vue-cli-service is a binary for easily serving, building, and prototyping vue code
+# Installation Steps
+
+1. Pull this from the repo
+2. Make a firebase project and replace this config with your own config
+3. Make a heroku app
+4. Link your heroku app with your own github repo
+5. push this to the linked branch on your heroku app
+# Functionality
+
+1. Go to <url>/adminpanel and click on refresh courses. This will load 20 of current quarter''s courses into your firebase.
+2. Go to <url>/ and search for a course by its I.D. (e.g. ANTH 3).
+3. Click on the given link and send messages to the chat. Now everyone on that course page can see your messages!
+
+# Known Problems
+Cannot upload files to chat.
+
+No username tracking for chat messages (yet!).
+# Contributing
+
+    Fork it!
+    Create your feature branch: git checkout -b my-new-feature
+    Commit your changes: git commit -am 'Add some feature'
+    Push to the branch: git push origin my-new-feature
+    Submit a pull request :D

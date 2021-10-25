@@ -1,3 +1,5 @@
+<!-- Much of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
+
 <template>
   <div class="window-container" :class="{ 'window-mobile': isDevice }">
 
