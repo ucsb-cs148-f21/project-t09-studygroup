@@ -1,1 +1,5 @@
-{}
+{
+    "scripts": {
+        "start": "chmod u+x build.sh && ./build.sh"
+    }
+}
