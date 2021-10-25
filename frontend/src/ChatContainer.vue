@@ -6,7 +6,7 @@
       :theme="theme"
       :styles="styles"
       :current-user-id="currentUserId"
-      :room-id="roomId"
+      :room-id="enrollCode"
       :rooms="classDoc"
 	  :single-room="true"
       :loading-rooms="loadingRooms"
@@ -74,7 +74,7 @@ export default {
 
       roomsPerPage: 15,
       rooms: [],
-      roomId: '',
+      enrollCode: '',
       startRooms: null,
       endRooms: null,
       roomsLoaded: false,
@@ -95,9 +95,9 @@ export default {
       disableForm: false,
       addNewRoom: null,
       addRoomUsername: '',
-      inviteRoomId: null,
+      inviteEnrollCode: null,
       invitedUsername: '',
-      removeRoomId: null,
+      removeEnrollCode: null,
       removeUserId: '',
       removeUsers: [],
       roomActions: [
@@ -254,7 +254,7 @@ export default {
 
         formattedRooms.push({
           ...room,
-          roomId: key,
+          enrollCode: key,
           avatar: roomAvatar,
           index: room.lastUpdated.seconds,
           lastMessage: {
@@ -281,7 +281,7 @@ export default {
     },
 
     listenLastMessage(room) {
-      const listener = messagesRef(room.roomId)
+      const listener = messagesRef(room.enrollCode)
         .orderBy('timestamp', 'desc')
         .limit(1)
         .onSnapshot((messages) => {
@@ -289,7 +289,7 @@ export default {
           messages.forEach((message) => {
             const lastMessage = this.formatLastMessage(message.data());
             const roomIndex = this.rooms.findIndex(
-              (r) => room.roomId === r.roomId,
+              (r) => room.enrollCode === r.enrollCode,
             );
             this.rooms[roomIndex].lastMessage = lastMessage;
             this.rooms = [...this.rooms];
@@ -344,24 +344,24 @@ export default {
 
       if (options.reset) {
         this.resetMessages();
-        this.roomId = room.roomId;
+        this.enrollCode = room.enrollCode;
       }
 
       if (this.endMessages && !this.startMessages) {
         return (this.messagesLoaded = true);
       }
 
-      const ref = messagesRef(room.roomId);
+      const ref = messagesRef(room.enrollCode);
 
       let query = ref.orderBy('timestamp', 'desc').limit(this.messagesPerPage);
 
       if (this.startMessages) query = query.startAfter(this.startMessages);
 
-      this.selectedRoom = room.roomId;
+      this.selectedRoom = room.enrollCode;
 
       query.get().then((messages) => {
         // this.incrementDbCounter('Fetch Room Messages', messages.size)
-        if (this.selectedRoom !== room.roomId) return;
+        if (this.selectedRoom !== room.enrollCode) return;
 
         if (messages.empty || messages.docs.length < this.messagesPerPage) {
           setTimeout(() => (this.messagesLoaded = true), 0);
@@ -415,7 +415,7 @@ export default {
         message.data().sender_id !== this.currentUserId
         && (!message.data().seen || !message.data().seen[this.currentUserId])
       ) {
-        messagesRef(room.roomId)
+        messagesRef(room.enrollCode)
           .doc(message.id)
           .update({
             [`seen.${this.currentUserId}`]: new Date(),
@@ -457,7 +457,7 @@ export default {
     },
 
     async sendMessage({
-      content, roomId, files, replyMessage,
+      content, enrollCode, files, replyMessage,
     }) {
       const message = {
         sender_id: '127.0.0.1',
@@ -481,19 +481,19 @@ export default {
         }
       }
 
-      const { id } = await messagesRef(roomId).add(message);
+      const { id } = await messagesRef(enrollCode).add(message);
 
       if (files) {
         for (let index = 0; index < files.length; index++) {
-          await this.uploadFile({ file: files[index], messageId: id, roomId });
+          await this.uploadFile({ file: files[index], messageId: id, enrollCode });
         }
       }
 
-      roomsRef.doc(roomId).update({ lastUpdated: new Date() });
+      roomsRef.doc(enrollCode).update({ lastUpdated: new Date() });
     },
 
     async editMessage({
-      messageId, newContent, roomId, files,
+      messageId, newContent, enrollCode, files,
     }) {
       const newMessage = { edited: new Date() };
       newMessage.content = newContent;
@@ -504,21 +504,21 @@ export default {
         newMessage.files = deleteDbField;
       }
 
-      await messagesRef(roomId)
+      await messagesRef(enrollCode)
         .doc(messageId)
         .update(newMessage);
 
       if (files) {
         for (let index = 0; index < files.length; index++) {
           if (files[index]?.blob) {
-            await this.uploadFile({ file: files[index], messageId, roomId });
+            await this.uploadFile({ file: files[index], messageId, enrollCode });
           }
         }
       }
     },
 
-    async deleteMessage({ message, roomId }) {
-      await messagesRef(roomId)
+    async deleteMessage({ message, enrollCode }) {
+      await messagesRef(enrollCode)
         .doc(message._id)
         .update({ deleted: new Date() });
 
@@ -536,7 +536,7 @@ export default {
       }
     },
 
-    async uploadFile({ file, messageId, roomId }) {
+    async uploadFile({ file, messageId, enrollCode }) {
       let type = file.extension || file.type;
       if (type === 'svg' || type === 'pdf') {
         type = file.type;
@@ -550,7 +550,7 @@ export default {
       await uploadFileRef.put(file.blob, { contentType: type });
       const url = await uploadFileRef.getDownloadURL();
 
-      const messageDoc = await messagesRef(roomId)
+      const messageDoc = await messagesRef(enrollCode)
         .doc(messageId)
         .get();
 
@@ -562,7 +562,7 @@ export default {
         }
       });
 
-      await messagesRef(roomId)
+      await messagesRef(enrollCode)
         .doc(messageId)
         .update({ files });
     },
@@ -595,7 +595,7 @@ export default {
     },
 
     async openUserTag({ user }) {
-      let roomId;
+      let enrollCode;
 
       this.rooms.forEach((room) => {
         if (room.users.length === 2) {
@@ -605,12 +605,12 @@ export default {
             (userId1 === user._id || userId1 === this.currentUserId)
             && (userId2 === user._id || userId2 === this.currentUserId)
           ) {
-            roomId = room.roomId;
+            enrollCode = room.enrollCode;
           }
         }
       });
 
-      if (roomId) return (this.roomId = roomId);
+      if (enrollCode) return (this.enrollCode = enrollCode);
 
       const query1 = await roomsRef
         .where('users', '==', [this.currentUserId, user._id])
@@ -633,7 +633,7 @@ export default {
         lastUpdated: new Date(),
       });
 
-      this.roomId = room.id;
+      this.enrollCode = room.id;
       this.fetchRooms();
     },
 
@@ -641,38 +641,38 @@ export default {
       query.forEach(async (room) => {
         if (this.loadingRooms) return;
         await roomsRef.doc(room.id).update({ lastUpdated: new Date() });
-        this.roomId = room.id;
+        this.enrollCode = room.id;
         this.fetchRooms();
       });
     },
 
-    menuActionHandler({ action, roomId }) {
+    menuActionHandler({ action, enrollCode }) {
       switch (action.name) {
         case 'inviteUser':
-          return this.inviteUser(roomId);
+          return this.inviteUser(enrollCode);
         case 'removeUser':
-          return this.removeUser(roomId);
+          return this.removeUser(enrollCode);
         case 'deleteRoom':
-          return this.deleteRoom(roomId);
+          return this.deleteRoom(enrollCode);
       }
     },
 
     async sendMessageReaction({
-      reaction, remove, messageId, roomId,
+      reaction, remove, messageId, enrollCode,
     }) {
       const dbAction = remove
         ? firebase.firestore.FieldValue.arrayRemove(this.currentUserId)
         : firebase.firestore.FieldValue.arrayUnion(this.currentUserId);
 
-      await messagesRef(roomId)
+      await messagesRef(enrollCode)
         .doc(messageId)
         .update({
           [`reactions.${reaction.unicode}`]: dbAction,
         });
     },
 
-    typingMessage({ message, roomId }) {
-      if (!roomId) return;
+    typingMessage({ message, enrollCode }) {
+      if (!enrollCode) return;
 
       if (message?.length > 1) {
         return (this.typingMessageCache = message);
@@ -688,7 +688,7 @@ export default {
         ? firebase.firestore.FieldValue.arrayUnion(this.currentUserId)
         : firebase.firestore.FieldValue.arrayRemove(this.currentUserId);
 
-      roomsRef.doc(roomId).update({
+      roomsRef.doc(enrollCode).update({
         typingUsers: dbAction,
       });
     },
@@ -697,7 +697,7 @@ export default {
       const listener = query.onSnapshot((rooms) => {
         // this.incrementDbCounter('Listen Rooms Typing Users', rooms.size)
         rooms.forEach((room) => {
-          const foundRoom = this.rooms.find((r) => r.roomId === room.id);
+          const foundRoom = this.rooms.find((r) => r.enrollCode === room.id);
           if (foundRoom) {
             foundRoom.typingUsers = room.data().typingUsers;
             foundRoom.index = room.data().lastUpdated.seconds;
@@ -754,7 +754,7 @@ export default {
               user.status = { ...snapshot.val(), lastChanged };
 
               const roomIndex = this.rooms.findIndex(
-                (r) => room.roomId === r.roomId,
+                (r) => room.enrollCode === r.enrollCode,
               );
 
               this.rooms[roomIndex] = room;
@@ -788,9 +788,9 @@ export default {
     },
 
     // change needed
-    inviteUser(roomId) {
+    inviteUser(enrollCode) {
       this.resetForms();
-      this.inviteRoomId = roomId;
+      this.inviteEnrollCode = enrollCode;
     },
 
     async addRoomUser() {
@@ -800,34 +800,34 @@ export default {
       await usersRef.doc(id).update({ _id: id });
 
       await roomsRef
-        .doc(this.inviteRoomId)
+        .doc(this.inviteEnrollCode)
         .update({ users: firebase.firestore.FieldValue.arrayUnion(id) });
 
-      this.inviteRoomId = null;
+      this.inviteEnrollCode = null;
       this.invitedUsername = '';
       this.fetchRooms();
     },
 
-    removeUser(roomId) {
+    removeUser(enrollCode) {
       this.resetForms();
-      this.removeRoomId = roomId;
-      this.removeUsers = this.rooms.find((room) => room.roomId === roomId).users;
+      this.removeEnrollCode = enrollCode;
+      this.removeUsers = this.rooms.find((room) => room.enrollCode === enrollCode).users;
     },
 
     async deleteRoomUser() {
       this.disableForm = true;
 
-      await roomsRef.doc(this.removeRoomId).update({
+      await roomsRef.doc(this.removeEnrollCode).update({
         users: firebase.firestore.FieldValue.arrayRemove(this.removeUserId),
       });
 
-      this.removeRoomId = null;
+      this.removeEnrollCode = null;
       this.removeUserId = '';
       this.fetchRooms();
     },
 
-    async deleteRoom(roomId) {
-      const room = this.rooms.find((r) => r.roomId === roomId);
+    async deleteRoom(enrollCode) {
+      const room = this.rooms.find((r) => r.enrollCode === enrollCode);
       if (
         room.users.find((user) => user._id === 'SGmFnBZB4xxMv9V4CVlW')
         || room.users.find((user) => user._id === '6jMsIXUrBHBj7o2cRlau')
@@ -835,14 +835,14 @@ export default {
         return alert('Nope, for demo purposes you cannot delete this room');
       }
 
-      const ref = messagesRef(roomId);
+      const ref = messagesRef(enrollCode);
 
       ref.get().then((res) => {
         if (res.empty) return;
         res.docs.map((doc) => ref.doc(doc.id).delete());
       });
 
-      await roomsRef.doc(roomId).delete();
+      await roomsRef.doc(enrollCode).delete();
 
       this.fetchRooms();
     },
@@ -851,9 +851,9 @@ export default {
       this.disableForm = false;
       this.addNewRoom = null;
       this.addRoomUsername = '';
-      this.inviteRoomId = null;
+      this.inviteEnrollCode = null;
       this.invitedUsername = '';
-      this.removeRoomId = null;
+      this.removeEnrollCode = null;
       this.removeUserId = '';
     },
 

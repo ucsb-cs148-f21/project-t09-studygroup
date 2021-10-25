@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import db from '../firestore/index.js';
+import {db} from '../firestore/index.js';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
 // @ is an alias to /src

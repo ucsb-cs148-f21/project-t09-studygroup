@@ -25,17 +25,16 @@ const config = {
 app.initializeApp(config);
 
 
+export const db = app.firestore();
 
-const firebase = app;
+export const firebase = app;
 if (window.location.hostname === 'localhost') {
   db.useEmulator('localhost', 2020);
   const auth = firebase.auth();
   auth.useEmulator('http://localhost:9099');
 }
 
-export firebase;
-export auth;
-export const db = app.firestore();
+
 
 export const storageRef = app.storage().ref();
 
