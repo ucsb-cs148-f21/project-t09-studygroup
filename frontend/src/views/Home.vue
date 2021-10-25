@@ -25,20 +25,9 @@
 </template>
 
 <script>
-import { initializeApp } from 'firebase/app';
+import app from '../firestore/index.js';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyDHcoFBHO8mYT_hnT8wjEqQqGtTSuFE9s0',
-  authDomain: 'study-group-148.firebaseapp.com',
-  projectId: 'study-group-148',
-  storageBucket: 'study-group-148.appspot.com',
-  messagingSenderId: '732562499999',
-  appId: '1:732562499999:web:f262480681942c6fdff5aa',
-  measurementId: 'G-T94E5J56CR',
-};
-
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // @ is an alias to /src
@@ -54,7 +43,7 @@ export default {
   },
   methods: {
     async onSubmit(event) {
-      this.links = []
+      this.links = [];
       event.preventDefault();
       const userInput = JSON.stringify(this.form);
       const courseName = JSON.parse(userInput).course;
@@ -67,10 +56,10 @@ export default {
         console.log(doc.id, ' => ', doc.data());
         const courseLink = 'http://localhost:8080/class/' + doc.id;
         console.log(courseLink);
-        this.links.push({message: "<a href='" + courseLink + "'>" + courseLink + "</a>"});
+        this.links.push({ message: "<a href='" + courseLink + "'>" + courseLink + "</a>" });
       });
       if(querySnapshot.empty){
-        this.links.push({message: "<p>Course Not Found</p>"});
+        this.links.push({ message: "<p>Course Not Found</p>" });
       }
     },
   },
