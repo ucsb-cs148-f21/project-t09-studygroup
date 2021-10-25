@@ -25,10 +25,8 @@
 </template>
 
 <script>
-import app from '../firestore/index.js';
+import db from '../firestore/index.js';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
-
-const db = getFirestore(app);
 
 // @ is an alias to /src
 export default {
