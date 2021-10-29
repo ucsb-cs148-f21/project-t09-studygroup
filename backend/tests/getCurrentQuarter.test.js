@@ -1,7 +1,8 @@
-import app from '../index.js';
+import {app} from '../index.js';
 import supertest from 'supertest';
 import axios from "axios";
 import { expect, jest } from '@jest/globals';
+import {getMostCurrentQuarter} from '../index.js';
 
 jest.mock("axios")
 const requestWithSupertest = supertest(app);
@@ -20,3 +21,18 @@ test('Correct Quarter', async () => {
     }});
   expect(res.body.quarter).toEqual('20214');
 })
+
+test('Correct Quarter', async () => {
+  axios.get.mockClear();
+  axios.get.mockResolvedValueOnce({data: {quarter: '20214'}})
+  let res = await getMostCurrentQuarter()
+  expect(axios.get).toBeCalledTimes(1);
+  expect(axios.get).toHaveBeenCalledWith('https://api.ucsb.edu/academics/quartercalendar/v1/quarters/current', {
+    headers: {
+      accept: 'application/json',
+      'ucsb-api-version': '1.0',
+      'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
+    }});
+  expect(res).toEqual('20214');
+})
+
