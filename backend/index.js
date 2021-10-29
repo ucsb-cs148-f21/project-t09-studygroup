@@ -53,7 +53,7 @@ const port = process.env.PORT || 3000;
 
 app.listen(port, () => console.log(`Running on port: ${port}`));
 
-async function getMostCurrentQuarter() {
+export async function getMostCurrentQuarter() {
   const qinfo = await axios.get('https://api.ucsb.edu/academics/quartercalendar/v1/quarters/current', {
 
     headers: {
@@ -105,4 +105,4 @@ async function getClasses(quarter) {
   return courseInfo;
 }
 
-export default app;
+export {app};
