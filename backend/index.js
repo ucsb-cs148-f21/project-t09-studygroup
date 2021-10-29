@@ -7,10 +7,11 @@ import cors from 'cors';
 import serveStatic from 'serve-static';
 import path from 'path';
 import { db } from './firestore.js';
+import _ from './currentDirectory.cjs';
+
+const {__dirname} = _;
 
 const app = express();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 
 // Automatically allow cross-origin requests
 app.use(cors({ origin: true }));
@@ -103,3 +104,5 @@ async function getClasses(quarter) {
   });
   return courseInfo;
 }
+
+export default app;
