@@ -97,9 +97,13 @@ Replace "myFirstDatabase" with "studyapp" replace <password> with your password 
 
 # While developing
 `npm run serve` to start the frontend
+    
 `npm run start:dev` to start the backend (with hot reloading!!)
+    
 `firebase emulators:start` to start the firebase emulators
+    
 `npm run test:server` to run unit tests for the server
+    
 # Functionality
 
 1. Go to <url>/adminpanel and click on refresh courses. This will load 20 of current quarter''s courses into your firebase.
