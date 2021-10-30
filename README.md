@@ -78,10 +78,12 @@ vue-cli-service is a binary for easily serving, building, and prototyping vue co
 # Installation Steps
 
 1. Pull this from the repo
-2. Make a firebase project and replace this config with your own config
-3. Make a heroku app
-4. Link your heroku app with your own github repo
-5. push this to the linked branch on your heroku app
+2. Go here and make an account: https://www.mongodb.com/try
+3. Make a mongodb cluster and copy and paste the connection url into a .env file inside the backend folder. DO NOT COMMIT TO GITHUB. 
+4. Make a firebase project and replace this config with your own config
+5. Make a heroku app
+6. Link your heroku app with your own github repo
+7. push this to the linked branch on your heroku app
 # Functionality
 
 1. Go to <url>/adminpanel and click on refresh courses. This will load 20 of current quarter''s courses into your firebase.

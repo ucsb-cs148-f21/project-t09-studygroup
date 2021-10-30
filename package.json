@@ -5,7 +5,7 @@
   "scripts": {
     "test:server": "cross-env NODE_ENV=test jest ./backend/tests --testTimeout=10000",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build ./frontend/src/main.js",
     "lint": "vue-cli-service lint",
     "start": "node ./backend/index.js"
   },
