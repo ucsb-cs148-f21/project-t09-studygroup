@@ -4,15 +4,19 @@ import express from 'express';
 import cors from 'cors';
 
 import path from 'path';
-import { db } from './firestore';
+// import { firestore } from './firestore.js';
+
+import { db } from './mongodb.js';
+
 import _ from './currentDirectory.cjs';
 
 const { DIRNAME } = _;
-
 const app = express();
 
-// Automatically allow cross-origin requests
-app.use(cors({ origin: true }));
+// allow cross-origin requests for development
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors({ origin: 'http://localhost:8080' }));
+}
 
 // build multiple CRUD interfaces:
 // TODO: 1. get the most current quarter using another axios request
@@ -77,13 +81,14 @@ export async function getMostCurrentQuarter() {
 
 app.post('/api/add-recent-classes', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
-  if ((await db.collection(`courses_${quarter}`).limit(1).get()).size !== 1) {
+  // Check collection exists before re writing over classes
+  if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
     (await getClasses(quarter)).forEach(async (el) => {
       const id = uuidv4();
       el.roomId = id;
       el.roomName = el.courseID;
       el.users = ['127.0.0.1'];
-      await db.collection(`courses_${quarter}`).doc(id).set(el);
+      await db.collection(`courses_${quarter}`).insertOne(el);
     });
   }
   res.sendStatus(200);

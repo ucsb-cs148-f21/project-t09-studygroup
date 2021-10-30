@@ -5,6 +5,8 @@ module.exports = {
   },
   extends: [
     'plugin:vue/essential',
+    'plugin:vue/strongly-recommended',
+    'plugin:vue/recommended',
     '@vue/airbnb',
   ],
   parserOptions: {
@@ -23,7 +25,7 @@ module.exports = {
         jest: true // now **/*.test.js files' env has both es6 *and* jest
       },
       // Can't extend in overrides: https://github.com/eslint/eslint/issues/8813
-      // "extends": ["plugin:jest/recommended"]
+      "extends": ["plugin:jest/recommended"],
       plugins: ["jest"],
       rules: {
         "jest/no-disabled-tests": "warn",

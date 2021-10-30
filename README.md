@@ -47,7 +47,16 @@ We will restrict the userbase to @ucsb.edu
 # Installation
 Prerequisites
 
-User should have npm, node, and git installed. Do this through nvm (Node Version Manager).
+User should have npm, node, and git installed. Do this through nvm (Node Version Manager). They should also have the firebase-cli installed for development.
+
+### Set up firebase
+Make sure firebase CLI is installed:
+
+`curl -sL firebase.tools | bash`
+
+Start the emulators:
+
+`firebase emulators:start`
 # Dependencies
 
 axios is a library that makes sending http requests with js easy.
@@ -79,7 +88,8 @@ vue-cli-service is a binary for easily serving, building, and prototyping vue co
 
 1. Pull this from the repo
 2. Go here and make an account: https://www.mongodb.com/try
-3. Make a mongodb cluster and copy and paste the connection url into a .env file inside the backend folder. DO NOT COMMIT TO GITHUB. 
+3. Make a mongodb cluster. Allow all ip addresses to connect. Create a user. Go to connect your application and create a connection url.
+Replace "myFirstDatabase" with "studyapp" replace <password> with your password for that user of the database. Copy and paste the connection url into a .env file in the root folder. `MONGO_URL=<url_here>` This file should model "sample.env" DO NOT COMMIT TO GITHUB OR REVEAL THIS TO ANYONE BUT YOURSELF. 
 4. Make a firebase project and replace this config with your own config
 5. Make a heroku app
 6. Link your heroku app with your own github repo

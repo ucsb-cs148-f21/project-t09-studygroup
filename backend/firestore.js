@@ -24,19 +24,19 @@ const config = {
 
 app.initializeApp(config);
 
-export const db = app.firestore();
+export const firestore = app.firestore();
 
 export const firebase = app;
 if (process.env.NODE_ENV !== 'production') {
-  db.useEmulator('localhost', 2020);
+  firestore.useEmulator('localhost', 2020);
   const auth = firebase.auth();
   auth.useEmulator('http://localhost:9099');
 }
 
 export const storageRef = app.storage().ref();
 
-export const usersRef = db.collection('users');
-export const roomsRef = db.collection('chatRooms');
+export const usersRef = firestore.collection('users');
+export const roomsRef = firestore.collection('chatRooms');
 export const messagesRef = (roomId) => roomsRef.doc(roomId).collection('messages');
 
 export const filesRef = storageRef.child('files');

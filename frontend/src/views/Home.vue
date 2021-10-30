@@ -1,6 +1,9 @@
 <template>
   <div id="search-form">
-    <b-form @submit="onSubmit" v-if="show">
+    <b-form
+      v-if="show"
+      @submit="onSubmit"
+    >
       <b-form-group
         id="input-group-1"
         label="Course:"
@@ -12,13 +15,22 @@
           v-model="form.course"
           placeholder="Search Course"
           required
-        ></b-form-input>
+        />
       </b-form-group>
-      <b-button id="submit" type="submit" variant="primary">Submit</b-button>
+      <b-button
+        id="submit"
+        type="submit"
+        variant="primary"
+      >
+        Submit
+      </b-button>
     </b-form>
     <ul id="chat-room-links">
-      <li v-for="link in links" :key="link.id">
-        <p v-html="link.message"></p>
+      <li
+        v-for="link in links"
+        :key="link.id"
+      >
+        <p v-html="link.message" />
       </li>
     </ul>
   </div>
@@ -54,7 +66,7 @@ export default {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         console.log(doc.id, ' => ', doc.data());
-        const courseLink = window.location.origin + '/class/' + doc.id;
+        const courseLink = `${window.location.origin}/class/${doc.id}`;
         console.log(courseLink);
         this.links.push({ message: `<a href='${courseLink}'>${courseLink}</a>` });
       });

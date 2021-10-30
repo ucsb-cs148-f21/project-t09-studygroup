@@ -1,8 +1,10 @@
 <!-- Much of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
 
 <template>
-  <div class="window-container" :class="{ 'window-mobile': isDevice }">
-
+  <div
+    class="window-container"
+    :class="{ 'window-mobile': isDevice }"
+  >
     <chat-window
       :height="screenHeight"
       :theme="theme"
@@ -10,7 +12,7 @@
       :current-user-id="currentUserId"
       :room-id="roomId"
       :rooms="classDoc"
-	  :single-room="true"
+      :single-room="true"
       :loading-rooms="loadingRooms"
       :messages="messages"
       :messages-loaded="messagesLoaded"

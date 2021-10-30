@@ -24,12 +24,5 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-### Set up firebase
-Make sure firebase CLI is installed:
 
-`curl -sL firebase.tools | bash`
-
-Start the emulators:
-
-`firebase emulators:start`
 

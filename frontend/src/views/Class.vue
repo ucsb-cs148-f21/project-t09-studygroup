@@ -1,37 +1,46 @@
 <!-- Much of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
 <template>
-    <div>
-        <div
-            class="app-container"
-            :class="{ 'app-mobile': isDevice, 'app-mobile-dark': theme === 'dark' }"
-        >
-            <!-- <div>
+  <div>
+    <div
+      class="app-container"
+      :class="{ 'app-mobile': isDevice, 'app-mobile-dark': theme === 'dark' }"
+    >
+      <!-- <div>
                 <button @click="resetData">Clear Data</button>
                 <button @click="addData" :disabled="updatingData">Add Data</button>
             </div> -->
 
-            <div v-if="showOptions" class="button-theme">
-                <button class="button-light" @click="theme = 'light'">
-                    Light
-                </button>
-                <button class="button-dark" @click="theme = 'dark'">
-                    Dark
-                </button>
-            </div>
+      <div
+        v-if="showOptions"
+        class="button-theme"
+      >
+        <button
+          class="button-light"
+          @click="theme = 'light'"
+        >
+          Light
+        </button>
+        <button
+          class="button-dark"
+          @click="theme = 'dark'"
+        >
+          Dark
+        </button>
+      </div>
 
-            <chat-container
-                v-if="showChat"
-                :current-user-id="currentUserId"
-                :theme="theme"
-                :is-device="isDevice"
-                @show-demo-options="showDemoOptions = $event"
-            />
+      <chat-container
+        v-if="showChat"
+        :current-user-id="currentUserId"
+        :theme="theme"
+        :is-device="isDevice"
+        @show-demo-options="showDemoOptions = $event"
+      />
 
-            <!-- <div class="version-container">
+      <!-- <div class="version-container">
                 v1.0.0
             </div> -->
-        </div>
     </div>
+  </div>
 </template>
 
 <script>
