@@ -1,4 +1,11 @@
 <template>
+<div v-if = "this.$store.state.loginUser.loginType = 'google' ">
+            <div class="center">
+              <p>Welcome {{this.$store.state.loginUser.google.user.name}} !</p>
+              <!-- <p>Email Address: {{this.$store.state.loginUser.google.user.email}} !</p> -->
+              <img :src="this.$store.state.loginUser.google.user.profileImage" />
+              <p><b>Google Access Token- </b>{{this.$store.state.loginUser.google.auth.access_token}}</p>
+            </div>
   <div id="search-form">
     <b-form
       v-if="show"
@@ -34,16 +41,22 @@
       </li>
     </ul>
   </div>
+  </div>
 </template>
 
 <script>
 import {
   getFirestore, collection, query, where, getDocs,
 } from 'firebase/firestore';
+import HomeMenu from '../components/Menu.vue';
 import { db } from '../firestore/index.js';
 
 // @ is an alias to /src
 export default {
+  name: 'home',
+  components: {
+    HomeMenu,
+  },
   data() {
     return {
       form: {
@@ -76,8 +89,8 @@ export default {
     },
   },
 };
-</script>
 
+</script>
 <style scoped>
 #search-form {
   height: 100px;
