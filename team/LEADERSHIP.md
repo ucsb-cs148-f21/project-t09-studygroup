@@ -11,4 +11,5 @@
 | Sun 10/17 | Joshua Avery      | Lead the sprint planning meeting                       |
 | Fri 10/22 | Jennice Xu        | Daily Scrum                                            |
 | Fri 10/29 | Jamie Wang        | Lead Sprint Planning meeting                           |
+| Mon 11/01 | Jennice Xu        | Daily Scrum                                            |
 | Wed 11/03 | Jennice Xu        | Lead the retro                                         |
