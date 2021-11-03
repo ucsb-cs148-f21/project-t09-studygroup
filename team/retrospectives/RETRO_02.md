@@ -1,4 +1,4 @@
-# Date of Retrospective: 10/13/21
+# Date of Retrospective: 11/03/21
 
 * Led by: Jennice Xu
 * Present: Kenneth Wang, Jamie Wang, Anisha Kabir, Joshua Avery
