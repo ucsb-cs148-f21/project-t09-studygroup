@@ -39,12 +39,6 @@ import router from '../router/index';
 export default {
   name: 'LoginSocial',
   methods: {
-    onLinkClicked() {
-      if (!isAuthenticated) {
-        // If not authenticated, add a path where to redirect after login.
-        this.$router.push({ name: 'login', query: { redirect: '/path' } });
-      }
-    },
     loginWithGoogle() {
       this.$gAuth
         .signIn()
@@ -66,6 +60,7 @@ export default {
               },
             },
           };
+          console.log(this.$store);
           this.$store.commit('setLoginUser', userInfo);
           this.$router.push({ path: '/home' });
         })

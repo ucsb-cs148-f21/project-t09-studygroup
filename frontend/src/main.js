@@ -7,10 +7,10 @@ import store from './store/index';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-import GoogleAuth from './configuration/google_oAuth.js';
+import GoogleAuth from './configuration/google_oAuth';
 
 const gauthOption = {
-  clientId: '186644924647-bl8ti02k5mondecje2l6065kb179qhml.apps.googleusercontent.com',
+  clientId: process.env.CLIENT_ID,
   scope: 'profile email',
   prompt: 'select_account',
 };
@@ -29,5 +29,6 @@ if (window.location.hostname === 'localhost') {
 
 new Vue({
   router,
+  store,
   render: (h) => h(App),
 }).$mount('#app');

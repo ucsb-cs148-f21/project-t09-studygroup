@@ -2,19 +2,37 @@
   <div class="main-container">
     <form>
       <div class="box-container">
-        <h2 class="heading">Sign In</h2>
-        <div class="form-fields">
-          <input id="email" name="email" type="text" placeholder="Email Address">
+        <h2 class="heading">
+          Sign In
+        </h2>
+        <!-- <div class="form-fields">
+          <input
+            id="email"
+            name="email"
+            type="text"
+            placeholder="Email Address"
+          >
         </div>
         <div class="form-fields">
-          <input id="password" name="password" type="text" placeholder="Password">
+          <input
+            id="password"
+            name="password"
+            type="text"
+            placeholder="Password"
+          >
         </div>
         <div class="form-fields">
-          <button class="signIn" name="commit" type="submit">
+          <button
+            class="signIn"
+            name="commit"
+            type="submit"
+          >
             Sign In
           </button>
+        </div> -->
+        <div class="login-choice">
+          <!-- <span>or Sign In with</span> -->
         </div>
-        <div class="login-choice"><span>or Sign In with</span></div>
         <SocialLogin />
       </div>
     </form>
@@ -25,7 +43,7 @@
 import SocialLogin from '../components/SocialLogin.vue';
 
 export default {
-  name: 'login',
+  name: 'Login',
   components: {
     SocialLogin,
   },
