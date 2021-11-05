@@ -4,8 +4,9 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 // import { firestore } from './firestore.js';
+import { OAuth2Client } from 'google-auth-library';
 
-import { db } from './mongodb.js';
+import { db, usersCollection } from './mongodb.js';
 
 import _ from './currentDirectory.cjs';
 
@@ -27,20 +28,17 @@ const login = express();
 // 6. learn how to store that into firebase
 // 7. make the Vue admin button to send request to this add-recent-classes
 
-async function verify(client) {
-  const token = this.$store.state.loginUser.google.auth.access_token;
+async function verify(client, token) {
   const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.CLIENT_ID,
+    idToken: token,
+    audience: process.env.VUE_APP_CLIENT_ID,
   });
   const payload = ticket.getPayload();
-  const userid = [payload['name'],payload['email'], payload['sub']];
-  return userid;
+  const userObj = { name: payload.name, google_email: payload.email, google_sub: payload.sub };
+  return userObj;
   // If request specified a G Suite domain:
   // const domain = payload['hd'];
 }
-
-
 
 async function getClasses(quarter) {
   let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=20&includeClassSections=true`, {
@@ -93,31 +91,30 @@ export async function getMostCurrentQuarter() {
 
   return qinfo.data.quarter;
 }
-login.post('/api/auth',async(req.res)) =>{
-  const {OAuth2Client} = require('google-auth-library');
-  const client = new OAuth2Client(process.env.CLIENT_ID);
-  try
-  {
-    const userid = verify(client);
+
+login.post('/api/auth', async (req, res) => {
+  const client = new OAuth2Client(process.env.VUE_APP_CLIENT_ID);
+  let userObj;
+  try {
+    userObj = verify(client, res.oauthToken);
+  } catch (error) {
+    res.status(401).send({ error: 'bad_oauth_token' });
+    return;
   }
-  catch(error)
-  {
-    res.sendStatus(404);
-  }
-  //find if sub exists
-  const len = userid[1].length();
-  if(userid[1].substr(len-9,len-1) != 'ucsb.edu')
-  {
-    if(db.collection('users'))
-    {
-      await db.collection('users').insertOne(userid);
+  // find if sub exists
+  const len = userObj[1].length();
+  if (userObj.google_email.substr(len - 9, len - 1) === 'ucsb.edu') {
+    if (usersCollection.findOne({ google_sub: userObj.google_sub }) === null) {
+      await db.collection('users').insertOne(userObj);
+    } else {
+      // Return JWT
     }
+  } else {
+    res.status(403).send({ error: 'non_ucsb_email' });
+    return;
   }
-  else{
-    res.sendStatus(403);
-  }
-  res.senStatus(200);
-};
+  res.sendStatus(200);
+});
 
 app.post('/api/add-recent-classes', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
@@ -133,7 +130,6 @@ app.post('/api/add-recent-classes', async (req, res) => {
   }
   res.sendStatus(200);
 });
-
 
 app.get('/api/currentQuarter', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
