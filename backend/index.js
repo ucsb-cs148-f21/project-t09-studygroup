@@ -28,7 +28,8 @@ if (process.env.NODE_ENV !== 'production') {
 // 7. make the Vue admin button to send request to this add-recent-classes
 
 async function getClasses(quarter) {
-  let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=20&includeClassSections=true`, {
+  var pageSize = 500;
+  let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=${pageSize}&includeClassSections=true`, {
 
     headers: {
       accept: 'application/json',
@@ -37,6 +38,22 @@ async function getClasses(quarter) {
     },
   });
   classesinfo = classesinfo.data;
+  var total = classesinfo.data.total;
+  var totalCourses = parseInt(total);
+  var page = 1;
+  while(500*page < totalCourses)
+  {
+    page += 1;
+    let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=${page}&pageSize=${pageSize}&includeClassSections=true`, {
+
+      headers: {
+        accept: 'application/json',
+        'ucsb-api-version': '1.0',
+        'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
+      },
+    });
+    classesinfo += classesinfo.data;
+  }
   const courseInfo = classesinfo.classes.map((item) => {
     const instructorList = [];
 
