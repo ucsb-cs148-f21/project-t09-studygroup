@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import router from '../router/index';
 
 export default {
@@ -63,6 +64,7 @@ export default {
           };
           console.log(this.$store);
           this.$store.commit('setLoginUser', userInfo);
+          axios.post(`${this.$API_BASE}auth`, { oauthToken: userInfo.auth.id_token });
           this.$router.push({ path: '/home' });
         })
         .catch((error) => {
