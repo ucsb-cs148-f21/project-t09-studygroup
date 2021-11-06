@@ -1,15 +1,17 @@
 import supertest from 'supertest';
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 import { app, getMostCurrentQuarter } from '../index.js';
 
 jest.mock('axios');
+jest.mock('../mongodb.js');
 const requestWithSupertest = supertest(app);
 
 // This is the test to check we have the correct current quarter accessed from the URL
 test('Correct Quarter', async () => {
   axios.get.mockResolvedValueOnce({ data: { quarter: '20214' } });
-  const res = await requestWithSupertest.get('/api/currentQuarter');
-
+  const res = await requestWithSupertest.get('/api/currentQuarter').set({ Authorization: `Bearer ${jwt.sign({ name: 'Sample Name' }, process.env.JWT_SECRET, { expiresIn: '1h' })}` });
+  console.log(res);
   expect(axios.get).toBeCalledTimes(1);
   expect(axios.get).toHaveBeenCalledWith('https://api.ucsb.edu/academics/quartercalendar/v1/quarters/current', {
     headers: {
