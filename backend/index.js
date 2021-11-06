@@ -6,12 +6,28 @@ import path from 'path';
 // import { firestore } from './firestore.js';
 import { OAuth2Client } from 'google-auth-library';
 
+import jwtMiddleware from 'express-jwt';
+import jwt from 'jsonwebtoken';
 import { db, usersCollection } from './mongodb.js';
 
 import _ from './currentDirectory.cjs';
 
 const { DIRNAME } = _;
 const app = express();
+
+const AUTH_ENDPOINT = '/api/auth';
+app.use(express.json());
+
+const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algorithms: ['RS256'] });
+
+// This will ensure that the user is authorized for all endpoints except for the authentication endpoint
+app.use((req, res, next) => {
+  if (req.baseUrl === AUTH_ENDPOINT) {
+    next();
+    return;
+  }
+  jwtMiddlewareFunc(req, res, next);
+});
 
 // allow cross-origin requests for development
 if (process.env.NODE_ENV !== 'production') {
@@ -28,7 +44,11 @@ if (process.env.NODE_ENV !== 'production') {
 // 6. learn how to store that into firebase
 // 7. make the Vue admin button to send request to this add-recent-classes
 
-// Some part of the function is cited from https://developers.google.com/identity/sign-in/web/backend-auth
+// eslint-disable-next-line camelcase
+function generateJWT(google_email, google_sub, name) {
+  jwt.sign({ google_email, google_sub, name }, process.env.JWT_SECRET, { expiresIn: '30s' });
+}
+
 async function verify(client, token) {
   const ticket = await client.verifyIdToken({
     idToken: token,
@@ -92,28 +112,32 @@ export async function getMostCurrentQuarter() {
 
   return qinfo.data.quarter;
 }
-login.post('/api/auth', async (req, res) => {
+
+app.post(AUTH_ENDPOINT, async (req, res) => {
   const client = new OAuth2Client(process.env.VUE_APP_CLIENT_ID);
   let userObj;
   try {
-    userObj = verify(client, res.oauthToken);
+    userObj = await verify(client, req.body.oauthToken);
   } catch (error) {
     res.status(401).send({ error: 'bad_oauth_token' });
     return;
   }
   // find if sub exists
-  const len = userObj[1].length();
-  if (userObj.google_email.substr(len - 9, len - 1) === 'ucsb.edu') {
-    if (usersCollection.findOne({ google_sub: userObj.google_sub }) === null) {
-      await db.collection('users').insertOne(userObj);
-    } else {
-      // Return JWT
+  const len = await userObj.google_email.length;
+  if (userObj.google_email.substr(len - 8) === 'ucsb.edu') {
+    let userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
+    if (userInDb === null) {
+      await usersCollection.insertOne(userObj);
+      userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
+      const serverToken = generateJWT(userInDb.google_email, userInDb.google_sub, userInDb.name);
+      res.status(200).send({ serverToken });
+      return;
     }
-  } else {
-    res.status(403).send({ error: 'non_ucsb_email' });
+    const serverToken = generateJWT(userInDb.google_email, userInDb.google_sub, userInDb.name);
+    res.status(200).send({ serverToken });
     return;
   }
-  res.sendStatus(200);
+  res.status(403).send({ error: 'non_ucsb_email' });
 });
 
 app.post('/api/add-recent-classes', async (req, res) => {

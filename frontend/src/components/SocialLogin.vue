@@ -52,14 +52,11 @@ export default {
           console.log('getBasicProfile', GoogleUser.getBasicProfile());
           console.log('getAuthResponse', GoogleUser.getAuthResponse());
           const userInfo = {
-            loginType: 'google',
-            google: {
-              auth: GoogleUser.getAuthResponse(),
-              user: {
-                name: GoogleUser.getBasicProfile().getName(),
-                email: GoogleUser.getBasicProfile().getEmail(),
-                profileImage: GoogleUser.getBasicProfile().getImageUrl(),
-              },
+            auth: GoogleUser.getAuthResponse(),
+            user: {
+              name: GoogleUser.getBasicProfile().getName(),
+              email: GoogleUser.getBasicProfile().getEmail(),
+              profileImage: GoogleUser.getBasicProfile().getImageUrl(),
             },
           };
           console.log(this.$store);
