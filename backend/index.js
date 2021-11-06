@@ -28,7 +28,7 @@ if (process.env.NODE_ENV !== 'production') {
 // 7. make the Vue admin button to send request to this add-recent-classes
 
 async function getClasses(quarter) {
-  const pageSize = 500;
+  const pageSize = 300;
   let listOfClasses = [];
   let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=${pageSize}&includeClassSections=true`, {
 
@@ -69,10 +69,10 @@ async function getClasses(quarter) {
     };
   });
   listOfClasses = listOfClasses.concat(courseInfo);
-  while (500 * page < totalCourses) {
+  while (pageSize * page < totalCourses) {
     page += 1;
     // eslint-disable-next-line no-await-in-loop
-    classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=${pageSize}&includeClassSections=true`, {
+    classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=${page}&pageSize=${pageSize}&includeClassSections=true`, {
 
       headers: {
         accept: 'application/json',
@@ -107,7 +107,6 @@ async function getClasses(quarter) {
     });
     listOfClasses = listOfClasses.concat(courseInfo);
   }
-  console.log(listOfClasses.length);
   return listOfClasses;
 }
 
@@ -127,23 +126,23 @@ export async function getMostCurrentQuarter() {
 app.post('/api/add-recent-classes', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
   // Check collection exists before re writing over classes
-  // if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
-  //   (await getClasses(quarter)).forEach(async (el) => {
-  //     const id = uuidv4();
-  //     el.roomId = id;
-  //     el.roomName = el.courseID;
-  //     el.users = ['127.0.0.1'];
-  //     await db.collection(`courses_${quarter}`).insertOne(el);
-  //   });
-  // }
-  db.collection(`courses_${quarter}`).deleteMany({});
-  (await getClasses(quarter)).forEach(async (el) => {
-    const id = uuidv4();
-    el.roomId = id;
-    el.roomName = el.courseID;
-    el.users = ['127.0.0.1'];
-    await db.collection(`courses_${quarter}`).insertOne(el);
-  });
+  if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
+    (await getClasses(quarter)).forEach(async (el) => {
+      const id = uuidv4();
+      el.roomId = id;
+      el.roomName = el.courseID;
+      el.users = ['127.0.0.1'];
+      await db.collection(`courses_${quarter}`).insertOne(el);
+    });
+  }
+  // db.collection(`courses_${quarter}`).deleteMany({});
+  // (await getClasses(quarter)).forEach(async (el) => {
+  //   const id = uuidv4();
+  //   el.roomId = id;
+  //   el.roomName = el.courseID;
+  //   el.users = ['127.0.0.1'];
+  //   await db.collection(`courses_${quarter}`).insertOne(el);
+  // });
   res.sendStatus(200);
 });
 app.get('/api/currentQuarter', async (req, res) => {
