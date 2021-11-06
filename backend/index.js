@@ -18,7 +18,7 @@ const app = express();
 const AUTH_ENDPOINT = '/api/auth';
 app.use(express.json());
 
-const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algorithms: ['RS256'] });
+const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algorithms: ['HS256'] });
 
 // This will ensure that the user is authorized for all endpoints except for the authentication endpoint
 app.use((req, res, next) => {
