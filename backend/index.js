@@ -17,7 +17,7 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(cors({ origin: 'http://localhost:8080' }));
 }
 
-const login = express();
+// const login = express();
 // build multiple CRUD interfaces:
 // TODO: 1. get the most current quarter using another axios request
 // 2. use the quarter in the getclass function
@@ -27,6 +27,8 @@ const login = express();
 // 6. learn how to store that into firebase
 // 7. make the Vue admin button to send request to this add-recent-classes
 
+//This is the function I cited from this website
+//https://developers.google.com/identity/sign-in/web/backend-auth
 async function verify(client) {
   const token = this.$store.state.loginUser.google.auth.access_token;
   const ticket = await client.verifyIdToken({
@@ -39,8 +41,6 @@ async function verify(client) {
   // If request specified a G Suite domain:
   // const domain = payload['hd'];
 }
-
-
 
 async function getClasses(quarter) {
   let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=20&includeClassSections=true`, {
@@ -93,31 +93,31 @@ export async function getMostCurrentQuarter() {
 
   return qinfo.data.quarter;
 }
-login.post('/api/auth',async(req.res)) =>{
-  const {OAuth2Client} = require('google-auth-library');
-  const client = new OAuth2Client(process.env.CLIENT_ID);
-  try
-  {
-    const userid = verify(client);
-  }
-  catch(error)
-  {
-    res.sendStatus(404);
-  }
-  //find if sub exists
-  const len = userid[1].length();
-  if(userid[1].substr(len-9,len-1) != 'ucsb.edu')
-  {
-    if(db.collection('users'))
-    {
-      await db.collection('users').insertOne(userid);
-    }
-  }
-  else{
-    res.sendStatus(403);
-  }
-  res.senStatus(200);
-};
+// login.post('/api/auth',async(req.res)) =>{
+//   const {OAuth2Client} = require('google-auth-library');
+//   const client = new OAuth2Client(process.env.CLIENT_ID);
+//   try
+//   {
+//     const userid = verify(client);
+//   }
+//   catch(error)
+//   {
+//     res.sendStatus(404);
+//   }
+//   //find if sub exists
+//   const len = userid[1].length();
+//   if(userid[1].substr(len-9,len-1) != 'ucsb.edu')
+//   {
+//     if(db.collection('users'))
+//     {
+//       await db.collection('users').insertOne(userid);
+//     }
+//   }
+//   else{
+//     res.sendStatus(403);
+//   }
+//   res.senStatus(200);
+// };
 
 app.post('/api/add-recent-classes', async (req, res) => {
   const quarter = await getMostCurrentQuarter();

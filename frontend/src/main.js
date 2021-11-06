@@ -15,7 +15,7 @@ const gauthOption = {
   prompt: 'select_account',
 };
 Vue.use(GoogleAuth, gauthOption);
-Vue.config.productionTip = true;
+Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);

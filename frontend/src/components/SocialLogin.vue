@@ -1,3 +1,4 @@
+// Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
 <template>
   <div class="signup-buttons">
     <div id="fb-root" />

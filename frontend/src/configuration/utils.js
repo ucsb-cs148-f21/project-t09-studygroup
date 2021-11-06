@@ -1,3 +1,4 @@
+// Cited and modified https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
 export const setStore = (name, content) => {
   if (!name) return;
   if (typeof content !== 'string') {
