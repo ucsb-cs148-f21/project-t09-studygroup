@@ -1,3 +1,4 @@
+// Much of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat
 import app from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/database';
