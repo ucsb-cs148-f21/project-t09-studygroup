@@ -64,7 +64,9 @@ async function verify(client, token) {
 }
 
 async function getClasses(quarter) {
-  let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=20&includeClassSections=true`, {
+  const pageSize = 300;
+  let listOfClasses = [];
+  let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=${pageSize}&includeClassSections=true`, {
 
     headers: {
       accept: 'application/json',
@@ -72,8 +74,11 @@ async function getClasses(quarter) {
       'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
     },
   });
+  const totalNumber = classesinfo.data.total;
+  const totalCourses = parseInt(totalNumber, 10);
+  let page = 1;
   classesinfo = classesinfo.data;
-  const courseInfo = classesinfo.classes.map((item) => {
+  let courseInfo = classesinfo.classes.map((item) => {
     const instructorList = [];
 
     item.classSections.forEach((element) => {
@@ -99,7 +104,46 @@ async function getClasses(quarter) {
       description,
     };
   });
-  return courseInfo;
+  listOfClasses = listOfClasses.concat(courseInfo);
+  while (pageSize * page < totalCourses) {
+    page += 1;
+    // eslint-disable-next-line no-await-in-loop
+    classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=${page}&pageSize=${pageSize}&includeClassSections=true`, {
+
+      headers: {
+        accept: 'application/json',
+        'ucsb-api-version': '1.0',
+        'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
+      },
+    });
+    classesinfo = classesinfo.data;
+    courseInfo = classesinfo.classes.map((item) => {
+      const instructorList = [];
+      item.classSections.forEach((element) => {
+        element.instructors.forEach((ele) => {
+          if (ele.functionCode === 'Teaching and in charge') {
+            instructorList.push(ele.instructor);
+          }
+        });
+        // if (element.instructors.functionCode === "Teaching and in charge") {
+        //   instructorList.push(element.instructors.instructor);
+        // }
+      });
+      let courseID = item.courseId;
+      courseID = courseID.replace(/\s+/g, ' ').trim();
+      const { title } = item;
+      const { description } = item;
+
+      return {
+        courseID,
+        title,
+        instructors: instructorList,
+        description,
+      };
+    });
+    listOfClasses = listOfClasses.concat(courseInfo);
+  }
+  return listOfClasses;
 }
 
 export async function getMostCurrentQuarter() {
@@ -154,6 +198,14 @@ app.post('/api/add-recent-classes', async (req, res) => {
       await db.collection(`courses_${quarter}`).insertOne(el);
     });
   }
+  // db.collection(`courses_${quarter}`).deleteMany({});
+  // (await getClasses(quarter)).forEach(async (el) => {
+  //   const id = uuidv4();
+  //   el.roomId = id;
+  //   el.roomName = el.courseID;
+  //   el.users = ['127.0.0.1'];
+  //   await db.collection(`courses_${quarter}`).insertOne(el);
+  // });
   res.sendStatus(200);
 });
 
