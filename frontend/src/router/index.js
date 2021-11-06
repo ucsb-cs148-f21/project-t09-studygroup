@@ -42,6 +42,7 @@ const routes = [
   },
 ];
 
+// Router code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,

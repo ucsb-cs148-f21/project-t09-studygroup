@@ -20,7 +20,4 @@ export const removeItem = (name) => {
   if (!name) return;
   return window.localStorage.removeItem(name);
 };
-/**
-   * Validate Email address
-   */
-export const isValidEmail = (value) => (!(value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,64}$/i.test(value)));
+

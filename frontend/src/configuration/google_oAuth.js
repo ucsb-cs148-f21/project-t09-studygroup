@@ -1,4 +1,4 @@
-//Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
+// Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
 const googleAuth = (function () {
   function installClient() {
     const apiUrl = 'https://apis.google.com/js/api.js';

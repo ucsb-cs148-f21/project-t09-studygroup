@@ -49,6 +49,8 @@ function generateJWT(google_email, google_sub, name) {
   jwt.sign({ google_email, google_sub, name }, process.env.JWT_SECRET, { expiresIn: '30s' });
 }
 
+// This is the function I cited from this website
+// https://developers.google.com/identity/sign-in/web/backend-auth
 async function verify(client, token) {
   const ticket = await client.verifyIdToken({
     idToken: token,

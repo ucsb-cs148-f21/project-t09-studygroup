@@ -48,14 +48,12 @@
 import {
   getFirestore, collection, query, where, getDocs,
 } from 'firebase/firestore';
-import HomeMenu from '../components/Menu.vue';
 import { db } from '../firestore/index.js';
 
 // @ is an alias to /src
 export default {
   name: 'Home',
   components: {
-    HomeMenu,
   },
   data() {
     return {

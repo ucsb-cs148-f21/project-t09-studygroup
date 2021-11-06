@@ -58,6 +58,7 @@ Start the emulators:
 
 `firebase emulators:start`
 # Dependencies
+We used files from this repo for signing in with google: https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
 
 axios is a library that makes sending http requests with js easy.
 
