@@ -1,38 +1,46 @@
 <template>
-  <div id="search-form">
-    <b-form
-      v-if="show"
-      @submit="onSubmit"
-    >
-      <b-form-group
-        id="input-group-1"
-        label="Course:"
-        label-for="input-1"
-        description="Enter the course id you are searching for (e.g. ANTH 3). The id is case-sensitive."
+  <div v-if="this.$store.state.loginUser.loginType = 'google' ">
+    <div class="center">
+      <p>Welcome {{ this.$store.state.loginUser.google.user.name }} !</p>
+      <!-- <p>Email Address: {{this.$store.state.loginUser.google.user.email}} !</p> -->
+      <img :src="this.$store.state.loginUser.google.user.profileImage">
+      <!-- <p><b>Google Access Token- </b>{{ this.$store.state.loginUser.google.auth.access_token }}</p> -->
+    </div>
+    <div id="search-form">
+      <b-form
+        v-if="show"
+        @submit="onSubmit"
       >
-        <b-form-input
-          id="input-1"
-          v-model="form.course"
-          placeholder="Search Course"
-          required
-        />
-      </b-form-group>
-      <b-button
-        id="submit"
-        type="submit"
-        variant="primary"
-      >
-        Submit
-      </b-button>
-    </b-form>
-    <ul id="chat-room-links">
-      <li
-        v-for="link in links"
-        :key="link.id"
-      >
-        <p v-html="link.message" />
-      </li>
-    </ul>
+        <b-form-group
+          id="input-group-1"
+          label="Course:"
+          label-for="input-1"
+          description="Enter the course id you are searching for (e.g. ANTH 3). The id is case-sensitive."
+        >
+          <b-form-input
+            id="input-1"
+            v-model="form.course"
+            placeholder="Search Course"
+            required
+          />
+        </b-form-group>
+        <b-button
+          id="submit"
+          type="submit"
+          variant="primary"
+        >
+          Submit
+        </b-button>
+      </b-form>
+      <ul id="chat-room-links">
+        <li
+          v-for="link in links"
+          :key="link.id"
+        >
+          <p v-html="link.message" />
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -44,6 +52,9 @@ import { db } from '../firestore/index.js';
 
 // @ is an alias to /src
 export default {
+  name: 'Home',
+  components: {
+  },
   data() {
     return {
       form: {
@@ -76,8 +87,8 @@ export default {
     },
   },
 };
-</script>
 
+</script>
 <style scoped>
 #search-form {
   height: 100px;
