@@ -13,3 +13,4 @@
 | Fri 10/29 | Jamie Wang        | Lead Sprint Planning meeting                           |
 | Mon 11/01 | Jennice Xu        | Daily Scrum                                            |
 | Wed 11/03 | Jennice Xu        | Lead the retro                                         |
+| Wed 11/08 | Jamie   | Lead the sprint planning meeting |
