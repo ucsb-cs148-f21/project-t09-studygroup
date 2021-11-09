@@ -23,8 +23,8 @@ const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algori
 
 // This will ensure that the user is authorized for all endpoints except for the authentication endpoint
 app.use((req, res, next) => {
-  console.log("BASE URL:    "+req.originalUrl);
-  if (req.originalUrl === AUTH_ENDPOINT || req.originalUrl === CLASS_ENDPOINT) {
+  console.log("BASE URL:    "+req.path);
+  if (req.path === AUTH_ENDPOINT || req.path === CLASS_ENDPOINT) {
     next();
     return;
   }
@@ -218,9 +218,12 @@ app.get('/api/currentQuarter', async (req, res) => {
 // app.get()
 
 app.get('/api/classes_search', async (req, res) => {
+  const course = req.query.course;
+  console.log("QUERY CLASS:    "+course);
+
   const quarter = await getMostCurrentQuarter();
-  const results = await db.collection(`courses_${quarter}`).find({}).toArray();
-  res.send(results);
+  const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } }, { score: { $meta: "textScore" }, courseID: 1, title: 1 }).sort({ score:{ $meta:"textScore" } }).toArray();
+  res.send(results.slice(0, 5)); // returns the top 5 most relevant courses
 });
 
 app.use('/', express.static(path.join(path.dirname(DIRNAME), '/dist')));
