@@ -16,13 +16,15 @@ const { DIRNAME } = _;
 const app = express();
 
 const AUTH_ENDPOINT = '/api/auth';
+const CLASS_ENDPOINT = '/api/classes_search';
 app.use(express.json());
 
 const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algorithms: ['HS256'] });
 
 // This will ensure that the user is authorized for all endpoints except for the authentication endpoint
 app.use((req, res, next) => {
-  if (req.baseUrl === AUTH_ENDPOINT) {
+  console.log("BASE URL:    "+req.originalUrl);
+  if (req.originalUrl === AUTH_ENDPOINT || req.originalUrl === CLASS_ENDPOINT) {
     next();
     return;
   }
@@ -214,6 +216,12 @@ app.get('/api/currentQuarter', async (req, res) => {
   res.send({ quarter });
 });
 // app.get()
+
+app.get('/api/classes_search', async (req, res) => {
+  const quarter = await getMostCurrentQuarter();
+  const results = await db.collection(`courses_${quarter}`).find({}).toArray();
+  res.send(results);
+});
 
 app.use('/', express.static(path.join(path.dirname(DIRNAME), '/dist')));
 app.get('/*', (req, res) => {
