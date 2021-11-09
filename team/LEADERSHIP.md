@@ -17,4 +17,4 @@
 | Mon 11/08 | Anisha Kabir      | Product Owner of the Week                              |
 | Mon 11/08 | Anisha Kabir      | Design Document Coordinator                            |
 | Mon 11/08 | Josuhua Avery     | Deployment Document Coordinator                        | 
-| Mon 11/15 | Jennice Xu        | Lead Retro #3                                          |
+| Mon 11/15 | Kenneth Wang      | Lead Retro #3                                          |
