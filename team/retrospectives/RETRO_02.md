@@ -1,16 +1,26 @@
-## Retro Assessment
+# Date of Retrospective: 11/03/21
+
+* Led by: Jennice Xu
+* Present: Kenneth Wang, Jamie Wang, Anisha Kabir, Joshua Avery
+* Absent: None
+
+## Action item
+
+* a goal: To balance the workload for every teammate, and make sure to understand your codes and do pull request descriptions on github.
+* a change: Pair programming will be help for people to share their workload
+* a measurement: Reflecting on progress towards our goals at the next retro; also how much of all the codes that we can explain and understand; also how many of the pull request descriptions that all teammates can fully understood. 
 
 A brief description of what retro outline or process you used.
 
-* We used the start/stop/continue method for our team retro. We each came up with ideas for each category and took time to discuss each point that was brought up.
+* We used the quick retro method for our team retro. We each came up with ideas for each category and took time to discuss each point that was brought up.
 
 A brief assessment of how it went.
 
-* We were able to generate a lot of ideas that help us both with our team communication and our project workflow. Each team member participated and presented their ideas. 
+* We all collaborate and help each others to make sure that we finish the user stories by the deadline.  Each team member participated and presented their ideas. 
 
 What advice would you give to the next person leading a retro based on what you learned today?
 
-* I would advise the next person leading a retro to make sure to get feedback from the group as the retro is happening, making sure that everyone is on the smae page and knows what is being discussed.
+* I would advise the next person leading a retro to make sure to record and summary teammates' idea as the retro is happening, making sure that everyone's idea is recorded and all the teammates are on the same page.
   
 ## Outcome of Retro Experiment
-Our measurement was to monitor the amount of pull requests we are able to complete and reflect on our progess. We were able to complete two pull requests so far this past week that moved us closer to our goals. Additionally, through commincation on slack and reflection in person we were able to better monitor our progress.
+

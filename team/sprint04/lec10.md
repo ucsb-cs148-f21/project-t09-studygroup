@@ -6,7 +6,7 @@ Meeting Time: lec10
 
 Type of meeting: daily scrum
 
-Team: Kenneth Wang [x], Joshua Avery [x], Jamie Wang [x], Jennice Xu [x], Anisha Kabir [],
+Team: Kenneth Wang [x], Joshua Avery [x], Jamie Wang [x], Jennice Xu [x], Anisha Kabir [x],
 
 Lead + Scribe: Jennice Xu
 

@@ -115,6 +115,8 @@ Replace "myFirstDatabase" with "studyapp" replace <password> with your password 
 Cannot upload files to chat.
 
 No username tracking for chat messages (yet!).
+    
+Voice chats are silent when sent in chat.
 # Contributing
 
     Fork it!

@@ -16,13 +16,14 @@ const { DIRNAME } = _;
 const app = express();
 
 const AUTH_ENDPOINT = '/api/auth';
+const CLASS_ENDPOINT = '/api/classes_search';
 app.use(express.json());
 
 const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algorithms: ['HS256'] });
 
 // This will ensure that the user is authorized for all endpoints except for the authentication endpoint
 app.use((req, res, next) => {
-  if (req.baseUrl === AUTH_ENDPOINT) {
+  if (req.path === AUTH_ENDPOINT || req.path === CLASS_ENDPOINT) {
     next();
     return;
   }
@@ -64,7 +65,9 @@ async function verify(client, token) {
 }
 
 async function getClasses(quarter) {
-  let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=20&includeClassSections=true`, {
+  const pageSize = 300;
+  let listOfClasses = [];
+  let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=${pageSize}&includeClassSections=true`, {
 
     headers: {
       accept: 'application/json',
@@ -72,8 +75,11 @@ async function getClasses(quarter) {
       'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
     },
   });
+  const totalNumber = classesinfo.data.total;
+  const totalCourses = parseInt(totalNumber, 10);
+  let page = 1;
   classesinfo = classesinfo.data;
-  const courseInfo = classesinfo.classes.map((item) => {
+  let courseInfo = classesinfo.classes.map((item) => {
     const instructorList = [];
 
     item.classSections.forEach((element) => {
@@ -99,7 +105,46 @@ async function getClasses(quarter) {
       description,
     };
   });
-  return courseInfo;
+  listOfClasses = listOfClasses.concat(courseInfo);
+  while (pageSize * page < totalCourses) {
+    page += 1;
+    // eslint-disable-next-line no-await-in-loop
+    classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=${page}&pageSize=${pageSize}&includeClassSections=true`, {
+
+      headers: {
+        accept: 'application/json',
+        'ucsb-api-version': '1.0',
+        'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
+      },
+    });
+    classesinfo = classesinfo.data;
+    courseInfo = classesinfo.classes.map((item) => {
+      const instructorList = [];
+      item.classSections.forEach((element) => {
+        element.instructors.forEach((ele) => {
+          if (ele.functionCode === 'Teaching and in charge') {
+            instructorList.push(ele.instructor);
+          }
+        });
+        // if (element.instructors.functionCode === "Teaching and in charge") {
+        //   instructorList.push(element.instructors.instructor);
+        // }
+      });
+      let courseID = item.courseId;
+      courseID = courseID.replace(/\s+/g, ' ').trim();
+      const { title } = item;
+      const { description } = item;
+
+      return {
+        courseID,
+        title,
+        instructors: instructorList,
+        description,
+      };
+    });
+    listOfClasses = listOfClasses.concat(courseInfo);
+  }
+  return listOfClasses;
 }
 
 export async function getMostCurrentQuarter() {
@@ -154,6 +199,14 @@ app.post('/api/add-recent-classes', async (req, res) => {
       await db.collection(`courses_${quarter}`).insertOne(el);
     });
   }
+  // db.collection(`courses_${quarter}`).deleteMany({});
+  // (await getClasses(quarter)).forEach(async (el) => {
+  //   const id = uuidv4();
+  //   el.roomId = id;
+  //   el.roomName = el.courseID;
+  //   el.users = ['127.0.0.1'];
+  //   await db.collection(`courses_${quarter}`).insertOne(el);
+  // });
   res.sendStatus(200);
 });
 
@@ -162,6 +215,15 @@ app.get('/api/currentQuarter', async (req, res) => {
   res.send({ quarter });
 });
 // app.get()
+
+app.get('/api/classes_search', async (req, res) => {
+  const course = req.query.course;
+  console.log("QUERY CLASS:    "+course);
+
+  const quarter = await getMostCurrentQuarter();
+  const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } }, { score: { $meta: "textScore" }, courseID: 1, title: 1 }).sort({ score:{ $meta:"textScore" } }).toArray();
+  res.send(results.slice(0, 5)); // returns the top 5 most relevant courses
+});
 
 app.use('/', express.static(path.join(path.dirname(DIRNAME), '/dist')));
 app.get('/*', (req, res) => {
