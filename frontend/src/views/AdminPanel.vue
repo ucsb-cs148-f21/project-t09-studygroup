@@ -11,13 +11,14 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
+// import axios from 'axios';
+import axiosInstance from '../main.js';
 
 export default {
   methods: {
     getClasses() {
       console.log(this.$API_BASE);
-      axios.post(`${this.$API_BASE}add-recent-classes`);
+      axiosInstance.post(`${this.$API_BASE}add-recent-classes`);
     },
   },
 

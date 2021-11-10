@@ -37,6 +37,7 @@
 <script>
 import axios from 'axios';
 import router from '../router/index';
+import axiosInstance from '../main.js'
 
 export default {
   name: 'LoginSocial',
@@ -61,7 +62,10 @@ export default {
           };
           console.log(this.$store);
           this.$store.commit('setLoginUser', userInfo);
-          axios.post(`${this.$API_BASE}auth`, { oauthToken: userInfo.auth.id_token });
+          const JWTdata = axios.post(`${this.$API_BASE}auth`, { oauthToken: userInfo.auth.id_token });
+          const JWT = JWTdata.data.serverToken;
+          this.$store.commit('setJWT', JWT);
+          // const data = axios.request;
           this.$router.push({ path: '/home' });
         })
         .catch((error) => {

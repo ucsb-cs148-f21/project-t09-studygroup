@@ -42,7 +42,7 @@ const routes = [
   },
 ];
 
-// Router code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat
+// Router code copied from demo folder here: https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
@@ -53,7 +53,7 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
   const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('user');
+  const loggedIn = localStorage.getItem('JWTtoken');
   if (authRequired && !loggedIn) {
     return next('/login');
   }
