@@ -23,7 +23,6 @@ const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algori
 
 // This will ensure that the user is authorized for all endpoints except for the authentication endpoint
 app.use((req, res, next) => {
-  console.log("BASE URL:    "+req.path);
   if (req.path === AUTH_ENDPOINT || req.path === CLASS_ENDPOINT) {
     next();
     return;
