@@ -47,7 +47,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 // eslint-disable-next-line camelcase
 function generateJWT(google_email, google_sub, name) {
-  jwt.sign({ google_email, google_sub, name }, process.env.JWT_SECRET, { expiresIn: '30s' });
+  return jwt.sign({ google_email, google_sub, name }, process.env.JWT_SECRET, { expiresIn: '1d' });
 }
 
 // This is the function I cited from this website

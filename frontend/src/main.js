@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import axios from 'axios';
 import App from './App.vue';
 import router from './router/index';
 import store from './store/index';
@@ -34,17 +33,4 @@ new Vue({
   render: (h) => h(App),
 }).$mount('#app');
 
-const axiosInstance = axios.create();
-axiosInstance.interceptors.request.use(
-  async (config) => {
-    const JWT = store.getJWT();
-    config.headers = {
-      baseURL: Vue.prototype.$API_BASE,
-      headers: { Authorization: `Bearer ${JWT}` },
-    };
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
 
-export { axiosInstance };

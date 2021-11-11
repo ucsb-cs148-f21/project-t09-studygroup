@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 // Adapted from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
 const user = getStore('user');
-const JWTtoken = getStore('JWT_token');
+const JWTtoken = localStorage.getItem('JWT_token');
 
 export default new Vuex.Store({
   state: {

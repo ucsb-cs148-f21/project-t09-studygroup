@@ -12,7 +12,7 @@
 </template>
 <script>
 // import axios from 'axios';
-import axiosInstance from '../main.js';
+import { axiosInstance } from '../utils/axiosInstance';
 
 export default {
   methods: {
