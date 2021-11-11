@@ -6,6 +6,7 @@ export const setStore = (name, content) => {
   }
   return window.localStorage.setItem(name, content);
 };
+
 /**
     * Get localStorage
   */

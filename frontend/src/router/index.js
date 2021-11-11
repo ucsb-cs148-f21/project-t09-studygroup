@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: '/',
-    redirect: '/login',
+    redirect: '/home',
   },
   {
     path: '/login',
@@ -53,12 +53,15 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
   const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('user');
+  const loggedIn = localStorage.getItem('JWT_token');
   if (authRequired && !loggedIn) {
     return next('/login');
   }
+  if (to.path === '/login' && loggedIn) {
+    return next('/home');
+  }
 
-  next();
+  return next();
 });
 
 export default router;

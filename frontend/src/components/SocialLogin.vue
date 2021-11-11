@@ -41,34 +41,30 @@ import router from '../router/index';
 export default {
   name: 'LoginSocial',
   methods: {
-    loginWithGoogle() {
-      this.$gAuth
-        .signIn()
-        .then((GoogleUser) => {
-          // on success do something
-          console.log('GoogleUser', GoogleUser);
-          console.log('getId', GoogleUser.getId());
-          console.log('basicprofile', GoogleUser.getBasicProfile().getName());
-          console.log('getBasicProfile', GoogleUser.getBasicProfile());
-          console.log('getAuthResponse', GoogleUser.getAuthResponse());
-          const userInfo = {
-            auth: GoogleUser.getAuthResponse(),
-            user: {
-              name: GoogleUser.getBasicProfile().getName(),
-              email: GoogleUser.getBasicProfile().getEmail(),
-              profileImage: GoogleUser.getBasicProfile().getImageUrl(),
-            },
-          };
-          console.log(this.$store);
-          this.$store.commit('setLoginUser', userInfo);
-          axios.post(`${this.$API_BASE}auth`, { oauthToken: userInfo.auth.id_token });
-          this.$router.push({ path: '/home' });
-        })
-        .catch((error) => {
-          console.log('error', error);
-        });
+    async loginWithGoogle() {
+      const GoogleUser = await this.$gAuth.signIn();
+      // on success do something
+      console.log('GoogleUser', GoogleUser);
+      console.log('getId', GoogleUser.getId());
+      console.log('basicprofile', GoogleUser.getBasicProfile().getName());
+      console.log('getBasicProfile', GoogleUser.getBasicProfile());
+      console.log('getAuthResponse', GoogleUser.getAuthResponse());
+      const userInfo = {
+        auth: GoogleUser.getAuthResponse(),
+        user: {
+          name: GoogleUser.getBasicProfile().getName(),
+          email: GoogleUser.getBasicProfile().getEmail(),
+          profileImage: GoogleUser.getBasicProfile().getImageUrl(),
+        },
+      };
+      console.log(this.$store);
+      this.$store.commit('setLoginUser', userInfo);
+      const JWTdata = await axios.post(`${this.$API_BASE}auth`, { oauthToken: userInfo.auth.id_token });
+      const JWT = JWTdata.data.serverToken;
+      this.$store.commit('setJWT', JWT);
+      this.$router.push({ path: '/home' });
     },
-
   },
+
 };
 </script>
