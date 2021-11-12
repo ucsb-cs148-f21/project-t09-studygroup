@@ -46,6 +46,9 @@ import {
   getFirestore, collection, query, where, getDocs,
 } from 'firebase/firestore';
 import { db } from '../firestore/index.js';
+import {
+  getFormattedQuarter, year, season,
+} from '../AdminPanel.vue';
 
 // @ is an alias to /src
 export default {
@@ -67,9 +70,10 @@ export default {
       event.preventDefault();
       const userInput = JSON.stringify(this.form);
       const courseName = JSON.parse(userInput).course;
+      const quarter = `courses_${getFormattedQuarter(year, season)}`;
 
       // search firebase for course
-      const q = query(collection(db, 'courses_20214'), where('courseID', '==', courseName));
+      const q = query(collection(db, quarter), where('courseID', '==', courseName));
 
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {

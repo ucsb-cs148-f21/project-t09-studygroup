@@ -64,6 +64,20 @@ async function verify(client, token) {
   // const domain = payload['hd'];
 }
 
+async function formatQuarter(year, season) {
+  let formattedQuarter = year;
+  if (season === 'Fall') {
+    formattedQuarter += '4';
+  } else if (season === 'Winter') {
+    formattedQuarter += '1';
+  } else if (season === 'Spring') {
+    formattedQuarter += '2';
+  } else if (season === 'Summer') {
+    formattedQuarter += '3';
+  }
+  return formattedQuarter;
+}
+
 async function getClasses(quarter) {
   const pageSize = 300;
   let listOfClasses = [];
@@ -209,6 +223,53 @@ app.post('/api/add-recent-classes', async (req, res) => {
   // });
   res.sendStatus(200);
 });
+
+app.post('/api/add-recent-classes', async (req, res) => {
+  const quarter = await getMostCurrentQuarter();
+  // Check collection exists before re writing over classes
+  if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
+    (await getClasses(quarter)).forEach(async (el) => {
+      const id = uuidv4();
+      el.roomId = id;
+      el.roomName = el.courseID;
+      el.users = ['127.0.0.1'];
+      await db.collection(`courses_${quarter}`).insertOne(el);
+    });
+  }
+  // db.collection(`courses_${quarter}`).deleteMany({});
+  // (await getClasses(quarter)).forEach(async (el) => {
+  //   const id = uuidv4();
+  //   el.roomId = id;
+  //   el.roomName = el.courseID;
+  //   el.users = ['127.0.0.1'];
+  //   await db.collection(`courses_${quarter}`).insertOne(el);
+  // });
+  res.sendStatus(200);
+});
+
+app.post('/api/add-classes', async (req, res, year, season) => {
+  const quarter = await formatQuarter(year, season);
+  // Check collection exists before re writing over classes
+  if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
+    (await getClasses(quarter)).forEach(async (el) => {
+      const id = uuidv4();
+      el.roomId = id;
+      el.roomName = el.courseID;
+      el.users = ['127.0.0.1'];
+      await db.collection(`courses_${quarter}`).insertOne(el);
+    });
+  }
+  // db.collection(`courses_${quarter}`).deleteMany({});
+  // (await getClasses(quarter)).forEach(async (el) => {
+  //   const id = uuidv4();
+  //   el.roomId = id;
+  //   el.roomName = el.courseID;
+  //   el.users = ['127.0.0.1'];
+  //   await db.collection(`courses_${quarter}`).insertOne(el);
+  // });
+  res.sendStatus(200);
+});
+
 
 app.get('/api/currentQuarter', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
