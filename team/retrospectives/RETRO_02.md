@@ -24,3 +24,4 @@ What advice would you give to the next person leading a retro based on what you 
   
 ## Outcome of Retro Experiment
 
+The workload for everyone is balanced. Though we add some descriptions in pull request, most descriptions are not detailed enough, hence in the future we will make it more detailed. Finally, we are working on pairs, which make the team work even more efficient. 
