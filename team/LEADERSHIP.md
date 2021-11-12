@@ -21,3 +21,4 @@
 | Fri 11/12 | Jennice Xu        | UX coordinator                                         |
 | Fri 11/12 | Jennice Xu        | Final presentation leader                              |
 | Fri 11/12 | Joshua Avery      | Testing/QA coordinator                                 |
+| Fri 11/12 | Kenneth Wang      | User manual                                            |
