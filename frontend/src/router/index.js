@@ -4,6 +4,7 @@ import Home from '../views/Home.vue';
 import Class from '../views/Class.vue';
 import Login from '../views/Login.vue';
 import AdminPanel from '../views/AdminPanel.vue';
+import { firebase } from '../firestore/index';
 
 Vue.use(VueRouter);
 
@@ -42,7 +43,7 @@ const routes = [
   },
 ];
 
-// Router code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat
+// Router code adapted from demo folder here: https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
@@ -53,11 +54,11 @@ router.beforeEach((to, from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
   const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
-  const loggedIn = localStorage.getItem('JWT_token');
-  if (authRequired && !loggedIn) {
+  const user = firebase.auth().currentUser;
+  if (authRequired && user === null) {
     return next('/login');
   }
-  if (to.path === '/login' && loggedIn) {
+  if (to.path === '/login' && user !== null) {
     return next('/home');
   }
 

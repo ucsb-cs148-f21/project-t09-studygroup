@@ -14,13 +14,13 @@
         is-nav
       >
         <b-navbar-nav>
-          <b-nav-item href="/home">
+          <b-nav-item to="/home">
             Home
           </b-nav-item>
-          <b-nav-item href="AdminPanel">
+          <b-nav-item to="AdminPanel">
             AdminPanel
           </b-nav-item>
-          <b-nav-item href="About">
+          <b-nav-item to="About">
             About
           </b-nav-item>
         </b-navbar-nav>
