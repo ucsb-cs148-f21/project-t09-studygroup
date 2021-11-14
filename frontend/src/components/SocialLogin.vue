@@ -5,7 +5,7 @@
       v-model="showFailureModal"
       ok-only
     >
-      Failed to sign in. Try reloading the page.
+      Failed to sign in. Try again. Make sure that pop ups are unblocked.
     </b-modal>
     <div id="fb-root" />
     <b-button
