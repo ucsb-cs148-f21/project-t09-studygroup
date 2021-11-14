@@ -4,36 +4,65 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 // import { firestore } from './firestore.js';
-import { OAuth2Client } from 'google-auth-library';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 
-import jwtMiddleware from 'express-jwt';
-import jwt from 'jsonwebtoken';
 import { db, usersCollection } from './mongodb.js';
+import toAsyncApp from './asyncApp.js';
 
 import _ from './currentDirectory.cjs';
 
 const { DIRNAME } = _;
-const app = express();
 
-const AUTH_ENDPOINT = '/api/auth';
-const CLASS_ENDPOINT = '/api/classes_search';
-app.use(express.json());
+if (process.env.FIREBASE_AUTH_EMULATOR_HOST !== undefined) {
+  // If we have an env var for the emulator then we should initialize our app with only a projectid
+  initializeApp({
+    projectId: 'study-group-148',
+  });
+} else {
+  initializeApp({
+    // Idea for taking in the config as a base64 string: https://stackoverflow.com/a/61844642
+    credential: cert(
+      JSON.parse(Buffer.from(process.env.FIREBASE_CONFIG_BASE64, 'base64').toString('ascii')),
+    ),
+  });
+}
 
-const jwtMiddlewareFunc = jwtMiddleware({ secret: process.env.JWT_SECRET, algorithms: ['HS256'] });
-
-// This will ensure that the user is authorized for all endpoints except for the authentication endpoint
-app.use((req, res, next) => {
-  if (req.path === AUTH_ENDPOINT || req.path === CLASS_ENDPOINT) {
-    next();
-    return;
-  }
-  jwtMiddlewareFunc(req, res, next);
-});
+const app = toAsyncApp(express());
 
 // allow cross-origin requests for development
 if (process.env.NODE_ENV !== 'production') {
   app.use(cors({ origin: 'http://localhost:8080' }));
 }
+
+const AUTH_ENDPOINT = '/api/auth';
+const CLASS_ENDPOINT = '/api/classes_search';
+
+app.use(express.json());
+
+async function verify(token) {
+  const decodedToken = await getAuth().verifyIdToken(token);
+  return decodedToken;
+}
+
+// This will ensure that the user is authorized for all endpoints except for the authentication endpoint
+app.use(async (req, res, next) => {
+  if (req.path === AUTH_ENDPOINT || req.path === CLASS_ENDPOINT) {
+    next();
+    return;
+  }
+  try {
+    const LEN_OF_BEARER = 'Bearer '.length;
+    const decodedToken = await verify(req.header('Authorization').substr(LEN_OF_BEARER));
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(401).send({ error: 'could_not_authenticate_token' });
+  }
+});
+
+
 
 // const login = express();
 // build multiple CRUD interfaces:
@@ -44,25 +73,6 @@ if (process.env.NODE_ENV !== 'production') {
 // 5. put each in its own json documents
 // 6. learn how to store that into firebase
 // 7. make the Vue admin button to send request to this add-recent-classes
-
-// eslint-disable-next-line camelcase
-function generateJWT(google_email, google_sub, name) {
-  return jwt.sign({ google_email, google_sub, name }, process.env.JWT_SECRET, { expiresIn: '1d' });
-}
-
-// This is the function I cited from this website
-// https://developers.google.com/identity/sign-in/web/backend-auth
-async function verify(client, token) {
-  const ticket = await client.verifyIdToken({
-    idToken: token,
-    audience: process.env.VUE_APP_CLIENT_ID,
-  });
-  const payload = ticket.getPayload();
-  const userObj = { name: payload.name, google_email: payload.email, google_sub: payload.sub };
-  return userObj;
-  // If request specified a G Suite domain:
-  // const domain = payload['hd'];
-}
 
 async function getClasses(quarter) {
   const pageSize = 300;
@@ -161,34 +171,27 @@ export async function getMostCurrentQuarter() {
 }
 
 app.post(AUTH_ENDPOINT, async (req, res) => {
-  const client = new OAuth2Client(process.env.VUE_APP_CLIENT_ID);
   let userObj;
   try {
-    userObj = await verify(client, req.body.oauthToken);
+    userObj = await verify(req.body.oauthToken);
   } catch (error) {
+    console.log(error);
     res.status(401).send({ error: 'bad_oauth_token' });
     return;
   }
-  // find if sub exists
-  const len = await userObj.google_email.length;
-  if (userObj.google_email.substr(len - 8) === 'ucsb.edu') {
-    let userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
-    if (userInDb === null) {
-      await usersCollection.insertOne(userObj);
-      userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
-      const serverToken = generateJWT(userInDb.google_email, userInDb.google_sub, userInDb.name);
-      res.status(200).send({ serverToken });
-      return;
-    }
-    const serverToken = generateJWT(userInDb.google_email, userInDb.google_sub, userInDb.name);
-    res.status(200).send({ serverToken });
+  let userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
+  if (userInDb === null) {
+    await usersCollection.insertOne(userObj);
+    userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
+    res.status(200).send({ message: 'created_user' });
     return;
   }
-  res.status(403).send({ error: 'non_ucsb_email' });
+  res.status(200).send({ message: 'user_already_exists' });
 });
 
 app.post('/api/add-recent-classes', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
+
   // Check collection exists before re writing over classes
   if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
     (await getClasses(quarter)).forEach(async (el) => {
@@ -207,7 +210,7 @@ app.post('/api/add-recent-classes', async (req, res) => {
   //   el.users = ['127.0.0.1'];
   //   await db.collection(`courses_${quarter}`).insertOne(el);
   // });
-  res.sendStatus(200);
+  res.status(200).send();
 });
 
 app.get('/api/currentQuarter', async (req, res) => {
@@ -217,11 +220,11 @@ app.get('/api/currentQuarter', async (req, res) => {
 // app.get()
 
 app.get('/api/classes_search', async (req, res) => {
-  const course = req.query.course;
-  console.log("QUERY CLASS:    "+course);
+  const { course } = req.query;
+  console.log(`QUERY CLASS:    ${course}`);
 
   const quarter = await getMostCurrentQuarter();
-  const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } }, { score: { $meta: "textScore" }, courseID: 1, title: 1 }).sort({ score:{ $meta:"textScore" } }).toArray();
+  const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } }, { score: { $meta: 'textScore' }, courseID: 1, title: 1 }).sort({ score: { $meta: 'textScore' } }).toArray();
   res.send(results.slice(0, 5)); // returns the top 5 most relevant courses
 });
 

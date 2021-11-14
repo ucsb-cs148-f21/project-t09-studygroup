@@ -1,5 +1,5 @@
 <template>
-  <div v-if="this.$store.state.loginUser.loginType = 'google' ">
+  <div>
     <div class="center">
       <p>Welcome !</p>
     </div>
