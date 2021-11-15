@@ -1,11 +1,16 @@
-<!--Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth-->
+<!--Some code comes from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth and some from https://firebase.google.com/docs/auth/web/google-signin#web-version-8-->
 <template>
   <div class="signup-buttons">
+    <b-modal
+      v-model="showFailureModal"
+      ok-only
+    >
+      Failed to sign in. Try again. Make sure that pop ups are unblocked.
+    </b-modal>
     <div id="fb-root" />
-    <a
-      href="#"
+    <b-button
       class="google-signup"
-      @click.prevent="loginWithGoogle"
+      @click="loginWithGoogle"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -30,38 +35,37 @@
         d="M9 3.5795c1.3214 0 2.5077.4541 3.4405 1.346l2.5813-2.5814C13.4632.8918 11.426 0 9 0 5.4818 0 2.4382 2.0168.9573 4.9582L3.964 7.29C4.6718 5.1627 6.6559 3.5795 9 3.5795z"
       /></g></svg>
       Google
-    </a>
+    </b-button>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import router from '../router/index';
+import { firebase } from '../firestore/index';
 
 export default {
   name: 'LoginSocial',
+  data() {
+    return {
+      showFailureModal: false,
+    };
+  },
   methods: {
     async loginWithGoogle() {
-      const GoogleUser = await this.$gAuth.signIn();
-      // on success do something
-      console.log('GoogleUser', GoogleUser);
-      console.log('getId', GoogleUser.getId());
-      console.log('basicprofile', GoogleUser.getBasicProfile().getName());
-      console.log('getBasicProfile', GoogleUser.getBasicProfile());
-      console.log('getAuthResponse', GoogleUser.getAuthResponse());
-      const userInfo = {
-        auth: GoogleUser.getAuthResponse(),
-        user: {
-          name: GoogleUser.getBasicProfile().getName(),
-          email: GoogleUser.getBasicProfile().getEmail(),
-          profileImage: GoogleUser.getBasicProfile().getImageUrl(),
-        },
-      };
-      console.log(this.$store);
-      this.$store.commit('setLoginUser', userInfo);
-      const JWTdata = await axios.post(`${this.$API_BASE}auth`, { oauthToken: userInfo.auth.id_token });
-      const JWT = JWTdata.data.serverToken;
-      this.$store.commit('setJWT', JWT);
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await firebase.auth().signInWithPopup(provider);
+      } catch (e) {
+        console.log(e);
+        this.showFailureModal = true;
+      }
+      try {
+        await axios.post(`${this.$API_BASE}auth`, { oauthToken: await firebase.auth().currentUser.getIdToken() });
+      } catch (error) {
+        await firebase.auth().signOut();
+        this.showFailureModal = true;
+        return;
+      }
       this.$router.push({ path: '/home' });
     },
   },

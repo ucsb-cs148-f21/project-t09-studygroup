@@ -2,19 +2,11 @@ import Vue from 'vue';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import App from './App.vue';
 import router from './router/index';
-import store from './store/index';
+import { firebase } from './firestore/index';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-import GoogleAuth from './configuration/google_oAuth';
-
-const gauthOption = {
-  clientId: process.env.VUE_APP_CLIENT_ID,
-  scope: 'profile email',
-  prompt: 'select_account',
-};
-Vue.use(GoogleAuth, gauthOption);
 Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
@@ -27,10 +19,10 @@ if (window.location.hostname === 'localhost') {
   Vue.prototype.$API_BASE = `${window.location.origin}/api/`;
 }
 
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app');
-
-
+const unsubscribe = firebase.auth().onAuthStateChanged(() => {
+  new Vue({
+    router,
+    render: (h) => h(App),
+  }).$mount('#app');
+  unsubscribe();
+});

@@ -18,3 +18,7 @@
 | Mon 11/08 | Anisha Kabir      | Design Document Coordinator                            |
 | Mon 11/08 | Josuhua Avery     | Deployment Document Coordinator                        | 
 | Mon 11/15 | Kenneth Wang      | Lead Retro #3                                          |
+| Fri 11/12 | Jennice Xu        | UX coordinator                                         |
+| Fri 11/12 | Jennice Xu        | Final presentation leader                              |
+| Fri 11/12 | Joshua Avery      | Testing/QA coordinator                                 |
+| Fri 11/12 | Kenneth Wang      | User manual                                            |
