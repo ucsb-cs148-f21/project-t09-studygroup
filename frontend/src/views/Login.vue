@@ -1,7 +1,10 @@
 <!--Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth-->
 
 <template>
-  <div class="main-container">
+  <div
+    class="fixed-top d-flex align-items-center justify-content-center"
+    style="bottom: 0; overflow-y: auto"
+  >
     <form>
       <div class="box-container">
         <h2 class="heading">

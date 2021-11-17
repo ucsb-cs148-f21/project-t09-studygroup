@@ -4,6 +4,7 @@ import Home from '../views/Home.vue';
 import Class from '../views/Class.vue';
 import Login from '../views/Login.vue';
 import AdminPanel from '../views/AdminPanel.vue';
+import UserProfile from '../views/UserProfile.vue';
 import { firebase } from '../firestore/index';
 
 Vue.use(VueRouter);
@@ -40,6 +41,11 @@ const routes = [
     path: '/adminpanel',
     name: 'Admin',
     component: AdminPanel,
+  },
+  {
+    path: '/userprofile',
+    name: 'profile',
+    component: UserProfile,
   },
 ];
 
