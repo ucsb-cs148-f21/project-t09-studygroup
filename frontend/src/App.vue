@@ -24,10 +24,38 @@
             About
           </b-nav-item>
         </b-navbar-nav>
-
-      <!-- Right aligned nav items -->
+        <!-- Right aligned nav items -->
+        <b-navbar-nav class="ms-auto">
+          <b-nav-item to="UserProfile">
+            <b-img
+              :src="`${photoURL}`"
+              rounded="circle"
+              alt="Circle image"
+              height="50"
+              width="50"
+            />
+          </b-nav-item>
+        </b-navbar-nav>
       </b-collapse>
     </b-navbar>
     <router-view />
   </div>
 </template>
+
+<script>
+import { firebase } from '@/firestore';
+
+export default {
+  data() {
+    return {
+      photoURL: '',
+    };
+  },
+  mounted() {
+    const user = firebase.auth().currentUser;
+    if (user !== null) {
+      this.photoURL = user.photoURL;
+    }
+  },
+};
+</script>
