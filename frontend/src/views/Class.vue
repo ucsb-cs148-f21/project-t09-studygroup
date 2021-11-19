@@ -1,4 +1,4 @@
-<!-- Much of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
+<!-- Some of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
 <template>
   <div v-if="isLoaded">
     <div v-if="!isUserInClass">
