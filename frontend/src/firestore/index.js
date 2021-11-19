@@ -5,23 +5,7 @@ import 'firebase/compat/database';
 import 'firebase/compat/storage';
 import 'firebase/compat/auth';
 
-const config = {
-
-  apiKey: 'AIzaSyDHcoFBHO8mYT_hnT8wjEqQqGtTSuFE9s0',
-
-  authDomain: 'study-group-148.firebaseapp.com',
-
-  projectId: 'study-group-148',
-
-  storageBucket: 'study-group-148.appspot.com',
-
-  messagingSenderId: '732562499999',
-
-  appId: '1:732562499999:web:f262480681942c6fdff5aa',
-
-  measurementId: 'G-T94E5J56CR',
-
-};
+const config = JSON.parse(process.env.VUE_APP_FIREBASE_CONFIG);
 
 app.initializeApp(config);
 

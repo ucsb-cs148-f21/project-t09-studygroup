@@ -1,3 +1,5 @@
+// Code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat
+const zeroPad = (num, pad) => String(num).padStart(pad, '0');
 export const parseTimestamp = (timestamp, format = '') => {
   if (!timestamp) return;
 
@@ -22,8 +24,6 @@ export const parseTimestamp = (timestamp, format = '') => {
 
   return date;
 };
-
-const zeroPad = (num, pad) => String(num).padStart(pad, '0');
 
 export const isSameDay = (d1, d2) => (
   d1.getFullYear() === d2.getFullYear()

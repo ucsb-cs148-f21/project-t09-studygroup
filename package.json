@@ -5,7 +5,7 @@
   "scripts": {
     "test:server": "cross-env NODE_ENV=test jest ./backend/tests --testTimeout=10000",
     "serve": "vue-cli-service serve ./frontend/src/main.js",
-    "start:dev": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 nodemon -r dotenv/config ./backend/index.js --watch ./backend",
+    "start:dev": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 nodemon -r dotenv/config ./backend/index.js --watch ./backend",
     "build": "vue-cli-service build ./frontend/src/main.js",
     "lint": "vue-cli-service lint ./frontend/src",
     "start": "node ./backend/index.js"
