@@ -1,4 +1,4 @@
-<!-- Much of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
+<!-- Almost all of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
 
 <template>
   <div
@@ -26,7 +26,7 @@
       @edit-message="editMessage"
       @delete-message="deleteMessage"
       @open-user-tag="openUserTag"
-      @add-room="addRoom"
+      @add-room="showAddRoomModal = true"
       @room-action-handler="menuActionHandler"
       @menu-action-handler="menuActionHandler"
       @send-message-reaction="sendMessageReaction"
@@ -36,6 +36,23 @@
         {{ room.roomName }}
       </template> -->
     </chat-window>
+
+    <b-modal
+      v-model="showAddRoomModal"
+      ok-only
+      ok-title="Cancel"
+    >
+      <add-users
+        @create-room="addRoom"
+      />
+    </b-modal>
+
+    <b-modal
+      v-model="chatRoomCreationError"
+      ok-only
+    >
+      Unexpected error creating chat room.
+    </b-modal>
   </div>
 </template>
 
@@ -43,6 +60,7 @@
 import axios from 'axios';
 import { doc, getDoc } from 'firebase/firestore';
 import ChatWindow, { Rooms } from 'vue-advanced-chat';
+import AddUsers from './components/AddUsers.vue';
 import {
   db,
   firebase,
@@ -55,11 +73,13 @@ import {
 import { parseTimestamp, isSameDay } from '@/utils/dates';
 // import ChatWindow from 'vue-advanced-chat'
 import 'vue-advanced-chat/dist/vue-advanced-chat.css';
+import { axiosInstance } from './utils/axiosInstance';
 // import ChatWindow from './../../dist/vue-advanced-chat.umd.min.js'
 
 export default {
   components: {
     ChatWindow,
+    'add-users': AddUsers,
   },
 
   props: {
@@ -72,7 +92,9 @@ export default {
 
   data() {
     return {
-	  classDoc: [],
+      classDoc: [],
+      showAddRoomModal: false,
+      chatRoomCreationError: false,
 
       roomsPerPage: 15,
       rooms: [],
@@ -305,7 +327,7 @@ export default {
     },
 
     formatLastMessage(message) {
-      if (!message.timestamp) return;
+      if (!message.timestamp) return undefined;
 
       let { content } = message;
       if (message.files?.length) {
@@ -763,9 +785,20 @@ export default {
       });
     },
 
-    addRoom() {
-      this.resetForms();
-      this.addNewRoom = true;
+    async addRoom(uidArray) {
+      uidArray.push(this.currentUserId);
+      try {
+        await db.collection('chatRooms').add({
+          classId: this.$route.params.id,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+          users: uidArray,
+        });
+        this.showAddRoomModal = false;
+        this.fetchRooms();
+      } catch (e) {
+        console.log(e);
+        this.chatRoomCreationError = true;
+      }
     },
 
     async createRoom() {

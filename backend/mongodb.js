@@ -7,7 +7,7 @@ await client.connect();
 const db = client.db();
 
 const usersCollection = db.collection('users');
-await usersCollection.createIndex({ google_sub: 1 }, { unique: true });
+await usersCollection.createIndex({ uid: 1 }, { unique: true });
 
 // eslint-disable-next-line import/prefer-default-export
 

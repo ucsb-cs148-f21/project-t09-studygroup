@@ -5,6 +5,7 @@ import cors from 'cors';
 import path from 'path';
 // import { firestore } from './firestore.js';
 import { initializeApp, cert } from 'firebase-admin/app';
+import { FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
 import { ObjectId } from 'mongodb';
@@ -12,6 +13,7 @@ import { db, usersCollection } from './mongodb.js';
 import toAsyncApp from './asyncApp.js';
 
 import _ from './currentDirectory.cjs';
+import { validateChatRoomBody } from './validations.js';
 
 const { DIRNAME } = _;
 
@@ -29,6 +31,7 @@ if (process.env.FIREBASE_AUTH_EMULATOR_HOST !== undefined) {
   });
 }
 
+const firestore = getFirestore();
 const app = toAsyncApp(express());
 
 // allow cross-origin requests for development
@@ -155,7 +158,6 @@ async function getClasses(quarter) {
   }
   return listOfClasses;
 }
-
 export async function getMostCurrentQuarter() {
   const qinfo = await axios.get('https://api.ucsb.edu/academics/quartercalendar/v1/quarters/current', {
 
@@ -178,10 +180,9 @@ app.post(AUTH_ENDPOINT, async (req, res) => {
     res.status(401).send({ error: 'bad_oauth_token' });
     return;
   }
-  let userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
+  const userInDb = await usersCollection.findOne({ uid: userObj.uid });
   if (userInDb === null) {
     await usersCollection.insertOne(userObj);
-    userInDb = await usersCollection.findOne({ google_sub: userObj.google_sub });
     res.status(200).send({ message: 'created_user' });
     return;
   }
@@ -194,7 +195,6 @@ app.post('/api/add-recent-classes', async (req, res) => {
   // Check collection exists before re writing over classes
   if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
     (await getClasses(quarter)).forEach(async (el) => {
-      const id = uuidv4();
       el.students = [];
       await db.collection(`courses_${quarter}`).insertOne(el);
     });
@@ -246,9 +246,33 @@ app.get('/api/class/:classID/user_search', async (req, res) => {
   const { searchText } = req.query;
   const quarter = await getMostCurrentQuarter();
   const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
-  const results = await db.collection('users').find({ uid: { $in: classObj.students }, $text: { $search: searchText } }, { score: { $meta: 'textScore' } }).sort({ score: { $meta: 'textScore' } }).toArray();
-  res.send(results.slice(0, 10)); // returns the top 5 most relevant courses
+  const results = await db.collection('users').find({ uid: { $in: classObj.students, $ne: req.user.uid }, $text: { $search: searchText } }, { score: { $meta: 'textScore' } }).sort({ score: { $meta: 'textScore' } }).toArray();
+  res.send({ results: results.slice(0, 10) }); // returns the top 5 most relevant courses
 });
+
+async function getClassByOid(Oid) {
+  const quarter = await getMostCurrentQuarter();
+  console.log(new ObjectId(Oid));
+  return db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(Oid) });
+}
+
+/* app.post('/api/class/:classId/chat_rooms', async (req, res) => {
+  if (validateChatRoomBody(req) === false) return res.sendStatus(422);
+  const { classId } = req.params;
+  const classObj = await getClassByOid(classId);
+  if (classObj === null) return res.status(404).send({ error: 'class_not_found' });
+
+  const isUserListValid = req.body.users.every((userId) => classObj.students.includes(userId));
+
+  if (isUserListValid === false) return res.status(409).send({ error: 'user_not_in_class' });
+  const ref = await firestore.doc(`chatRooms/${uuidv4()}`);
+  await ref.update({
+    classId,
+    lastUpdated: FieldValue.serverTimestamp(),
+    users: req.body.users,
+  });
+  res.sendStatus(200);
+}); */
 
 app.use('/', express.static(path.join(path.dirname(DIRNAME), '/dist')));
 app.get('/*', (req, res) => {
