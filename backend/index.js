@@ -50,7 +50,7 @@ async function verify(token) {
 
 // This will ensure that the user is authorized for all endpoints except for the authentication endpoint
 app.use(async (req, res, next) => {
-  if (req.path === AUTH_ENDPOINT) {
+  if (req.path === AUTH_ENDPOINT || req.path.substr(0, 3) !== 'api') {
     next();
     return;
   }
