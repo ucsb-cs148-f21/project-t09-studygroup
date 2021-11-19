@@ -11,8 +11,7 @@
       :styles="styles"
       :current-user-id="currentUserId"
       :room-id="roomId"
-      :rooms="classDoc"
-      :single-room="true"
+      :rooms="rooms"
       :loading-rooms="loadingRooms"
       :messages="messages"
       :messages-loaded="messagesLoaded"
@@ -142,7 +141,7 @@ export default {
   },
 
   mounted() {
-    this.fetchClassDoc(this.$route.params.id);
+    this.fetchRooms(this.$route.params.id);
     console.log(this.$route);
     this.updateUserOnlineStatus();
   },
@@ -185,15 +184,16 @@ export default {
 
     async fetchMoreRooms() {
       if (this.endRooms && !this.startRooms) return (this.roomsLoaded = true);
-
+      console.log(this.currentUserId);
       let query = roomsRef
-        .where('users', 'array-contains', this.currentUserId)
+        .where('users', 'array-contains', this.currentUserId).where('classId', '==', this.$route.params.id)
         .orderBy('lastUpdated', 'desc')
         .limit(this.roomsPerPage);
 
       if (this.startRooms) query = query.startAfter(this.startRooms);
 
       const rooms = await query.get();
+      console.log(rooms.size);
       // this.incrementDbCounter('Fetch Rooms', rooms.size)
 
       this.roomsLoaded = rooms.empty || rooms.size < this.roomsPerPage;
@@ -457,7 +457,7 @@ export default {
       content, roomId, files, replyMessage,
     }) {
       const message = {
-        sender_id: '127.0.0.1',
+        sender_id: this.currentUserId,
         content,
         timestamp: new Date(),
       };

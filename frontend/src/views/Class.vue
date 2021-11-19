@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { roomsRef, usersRef } from '../firestore';
+import { roomsRef, usersRef, firebase } from '../firestore';
 import ChatContainer from '../ChatContainer.vue';
 
 export default {
@@ -55,26 +55,8 @@ export default {
   data() {
     return {
       theme: 'light',
-      showChat: true,
-      users: [
-        {
-          _id: '6R0MijpK6M4AIrwaaCY2',
-          username: 'Luke',
-          avatar: 'https://66.media.tumblr.com/avatar_c6a8eae4303e_512.pnj',
-        },
-        {
-          _id: 'SGmFnBZB4xxMv9V4CVlW',
-          username: 'Leia',
-          avatar: 'https://avatarfiles.alphacoders.com/184/thumb-184913.jpg',
-        },
-        {
-          _id: '6jMsIXUrBHBj7o2cRlau',
-          username: 'Yoda',
-          avatar:
-                        'https://vignette.wikia.nocookie.net/teamavatarone/images/4/45/Yoda.jpg/revision/latest?cb=20130224160049',
-        },
-      ],
-      currentUserId: '6R0MijpK6M4AIrwaaCY2',
+      showChat: false,
+      currentUserId: '',
       isDevice: false,
       showDemoOptions: true,
       updatingData: false,
@@ -87,18 +69,22 @@ export default {
     },
   },
 
-  watch: {
+  /* watch: {
     currentUserId() {
       this.showChat = false;
       setTimeout(() => (this.showChat = true), 150);
     },
-  },
+  }, */
 
   mounted() {
     this.isDevice = window.innerWidth < 500;
     window.addEventListener('resize', (ev) => {
       if (ev.isTrusted) this.isDevice = window.innerWidth < 500;
     });
+
+    this.currentUserId = firebase.auth().currentUser.uid;
+    console.log(firebase.auth().currentUser);
+    this.showChat = true;
   },
 
   methods: {
