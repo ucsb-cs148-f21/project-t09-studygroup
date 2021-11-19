@@ -42,6 +42,8 @@ Administrator
 
 We will restrict the userbase to @ucsb.edu
 
+(Deployment)[./docs/Deploy.md]
+
 
 
 # Installation
