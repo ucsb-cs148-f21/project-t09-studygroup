@@ -222,7 +222,7 @@ app.put('/api/class/:classID/users', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
   const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
   if (classObj === null) { return res.sendStatus(404); }
-  classObj.students.append(decodedToken.uid);
+  classObj.students.push(decodedToken.uid);
   await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(req.params.classID) }, classObj);
   return res.send(200);
 });
