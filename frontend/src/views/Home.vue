@@ -32,9 +32,13 @@
       <ul id="chat-room-links">
         <li
           v-for="link in links"
-          :key="link.id"
+          :key="link._id"
         >
-          <p v-html="link.message" />
+        <router-link :to="`/class/${link._id}`"> {{link.courseID}} </router-link>
+        <p>
+        {{link.description}}
+        </p>
+          <!-- <p v-html="link.message" /> -->
         </li>
       </ul>
     </div>
@@ -42,11 +46,8 @@
 </template>
 
 <script>
-import {
-  getFirestore, collection, query, where, getDocs,
-} from 'firebase/firestore';
-import { db } from '../firestore/index.js';
-
+// import axios from 'axios';
+import { axiosInstance } from '../utils/axiosInstance';
 // @ is an alias to /src
 export default {
   name: 'Home',
@@ -57,6 +58,7 @@ export default {
       form: {
         course: '',
       },
+      titlemessage: 'coursename: ',
       links: [],
       show: true,
     };
@@ -66,21 +68,31 @@ export default {
       this.links = [];
       event.preventDefault();
       const userInput = JSON.stringify(this.form);
-      const courseName = JSON.parse(userInput).course;
+      const cname = JSON.parse(userInput).course;
 
-      // search firebase for course
-      const q = query(collection(db, 'courses_20214'), where('courseID', '==', courseName));
+      this.links = (await axiosInstance.get(`classes_search?course=${cname}`)).data.results;
+      // const str = JSON.stringify(this.links, null, 2);
+      // console.log(str);
+      console.log(this.links);
+      // const courseLink = `${window.location.origin}/class/${this.info._id}`;
+    // async onSubmit(event) {
+    //   this.links = [];
+    //   event.preventDefault();
+    //   const searchText = this.course;
 
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, ' => ', doc.data());
-        const courseLink = `${window.location.origin}/class/${doc.id}`;
-        console.log(courseLink);
-        this.links.push({ message: `<a href='${courseLink}'>${courseLink}</a>` });
-      });
-      if (querySnapshot.empty) {
-        this.links.push({ message: '<p>Course Not Found</p>' });
-      }
+    //   // search firebase for course
+    //   const q = query(collection(db, 'courses_20214'), where('courseID', '==', courseName));
+
+    //   const querySnapshot = await getDocs(q);
+    //   querySnapshot.forEach((doc) => {
+    //     console.log(doc.id, ' => ', doc.data());
+    //     const courseLink = `${window.location.origin}/class/${doc._id}`;
+    //     console.log(courseLink);
+    //     this.links.push({ message: `<a href='${courseLink}'>${courseLink}</a>` });
+    //   });
+    //   if (querySnapshot.empty) {
+    //     this.links.push({ message: '<p>Course Not Found</p>' });
+    //   }
     },
   },
 };
@@ -104,4 +116,5 @@ li {
   padding-top: 40px;
   padding-left: 0px;
 }
+
 </style>
