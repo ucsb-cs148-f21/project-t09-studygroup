@@ -58,6 +58,7 @@ Start the emulators:
 
 `firebase emulators:start`
 # Dependencies
+LOTS of credit to vue-advanced-chat for giving us demo files we could put in our project and adapt.
 
 axios is a library that makes sending http requests with js easy.
 
