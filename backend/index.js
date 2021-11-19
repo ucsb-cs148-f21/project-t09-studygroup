@@ -24,9 +24,8 @@ if (process.env.FIREBASE_AUTH_EMULATOR_HOST !== undefined) {
   });
 } else {
   initializeApp({
-    // Idea for taking in the config as a base64 string: https://stackoverflow.com/a/61844642
     credential: cert(
-      JSON.parse(Buffer.from(process.env.FIREBASE_CONFIG_BASE64, 'base64').toString('ascii')),
+      JSON.parse(process.env.FIREBASE_CONFIG.replace(/\\n/g, '\n'),),
     ),
   });
 }
@@ -84,7 +83,7 @@ async function getClasses(quarter) {
     headers: {
       accept: 'application/json',
       'ucsb-api-version': '1.0',
-      'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
+      'ucsb-api-key': process.env.UCSB_API_KEY,
     },
   });
   const totalNumber = classesinfo.data.total;
@@ -126,7 +125,7 @@ async function getClasses(quarter) {
       headers: {
         accept: 'application/json',
         'ucsb-api-version': '1.0',
-        'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
+        'ucsb-api-key': process.env.UCSB_API_KEY,
       },
     });
     classesinfo = classesinfo.data;
@@ -164,7 +163,7 @@ export async function getMostCurrentQuarter() {
     headers: {
       accept: 'application/json',
       'ucsb-api-version': '1.0',
-      'ucsb-api-key': 'e7Ur5HGjiyp11ZkCIe5VXmsEgi3W6P4E',
+      'ucsb-api-key': process.env.UCSB_API_KEY,
     },
   });
 
