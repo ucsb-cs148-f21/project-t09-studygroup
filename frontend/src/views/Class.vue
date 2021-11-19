@@ -60,6 +60,7 @@ export default {
       isDevice: false,
       showDemoOptions: true,
       updatingData: false,
+      classData: {}
     };
   },
 
@@ -75,7 +76,10 @@ export default {
       setTimeout(() => (this.showChat = true), 150);
     },
   }, */
-
+  async beforeRouteUpdate(to, from, next) {
+    this.classData = (await axiosInstance.get(`class/${to.id}`)).data;
+  },
+  
   mounted() {
     this.isDevice = window.innerWidth < 500;
     window.addEventListener('resize', (ev) => {
@@ -84,185 +88,8 @@ export default {
 
     this.currentUserId = firebase.auth().currentUser.uid;
     console.log(firebase.auth().currentUser);
+    this.classData = (await axiosInstance.get(`class/${this.$route.params.id}`)).data;
     this.showChat = true;
-  },
-
-  methods: {
-    resetData() {
-      roomsRef.get().then((val) => {
-        val.forEach(async (val) => {
-          const ref = roomsRef.doc(val.id).collection('messages');
-
-          await ref.get().then((res) => {
-            if (res.empty) return;
-            res.docs.map((doc) => ref.doc(doc.id).delete());
-          });
-
-          roomsRef.doc(val.id).delete();
-        });
-      });
-
-      usersRef.get().then((val) => {
-        val.forEach((val) => {
-          usersRef.doc(val.id).delete();
-        });
-      });
-    },
-    async addData() {
-      this.updatingData = true;
-
-      const user1 = this.users[0];
-      await usersRef.doc(user1._id).set(user1);
-
-      const user2 = this.users[1];
-      await usersRef.doc(user2._id).set(user2);
-
-      const user3 = this.users[2];
-      await usersRef.doc(user3._id).set(user3);
-
-      await roomsRef.add({
-        users: [user1._id, user2._id],
-        lastUpdated: new Date(),
-      });
-      await roomsRef.add({
-        users: [user1._id, user3._id],
-        lastUpdated: new Date(),
-      });
-      await roomsRef.add({
-        users: [user2._id, user3._id],
-        lastUpdated: new Date(),
-      });
-      await roomsRef.add({
-        users: [user1._id, user2._id, user3._id],
-        lastUpdated: new Date(),
-      });
-
-      this.updatingData = false;
-    },
   },
 };
 </script>
-
-<style >
-/* body {
-    background: #fafafa;
-    margin: 0;
-}
-
-input {
-    -webkit-appearance: none;
-}
-
-.app-container {
-    font-family: 'Quicksand', sans-serif;
-    padding: 20px 30px 30px;
-}
-
-.app-mobile {
-    padding: 0;
-
-    &.app-mobile-dark {
-        background: #131415;
-    }
-
-    .user-logged {
-        margin: 10px 5px 0 10px;
-    }
-
-    select {
-        margin: 10px 0;
-    }
-
-    .button-theme {
-        margin: 10px 10px 0 0;
-
-        .button-github {
-            height: 23px;
-
-            img {
-                height: 23px;
-            }
-        }
-    }
-}
-
-.user-logged {
-    font-size: 12px;
-    margin-right: 5px;
-    margin-top: 10px;
-
-    &.user-logged-dark {
-        color: #fff;
-    }
-}
-
-select {
-    height: 20px;
-    outline: none;
-    border: 1px solid #e0e2e4;
-    border-radius: 4px;
-    background: #fff;
-    margin-bottom: 20px;
-}
-
-.button-theme {
-    float: right;
-    display: flex;
-    align-items: center;
-
-    .button-light {
-        background: #fff;
-        border: 1px solid #46484e;
-        color: #46484e;
-    }
-
-    .button-dark {
-        background: #1c1d21;
-        border: 1px solid #1c1d21;
-    }
-
-    button {
-        color: #fff;
-        outline: none;
-        cursor: pointer;
-        border-radius: 4px;
-        padding: 6px 12px;
-        margin-left: 10px;
-        border: none;
-        font-size: 14px;
-        transition: 0.3s;
-        vertical-align: middle;
-
-        &.button-github {
-            height: 30px;
-            background: none;
-            padding: 0;
-            margin-left: 20px;
-
-            img {
-                height: 30px;
-            }
-        }
-
-        &:hover {
-            opacity: 0.8;
-        }
-
-        &:active {
-            opacity: 0.6;
-        }
-
-        @media only screen and (max-width: 768px) {
-            padding: 3px 6px;
-            font-size: 13px;
-        }
-    }
-}
-
-.version-container {
-    padding-top: 20px;
-    text-align: right;
-    font-size: 14px;
-    color: grey;
-} */
-</style>

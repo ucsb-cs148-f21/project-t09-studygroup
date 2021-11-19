@@ -19,4 +19,10 @@ db.collection('courses_20214').createIndex(
     description: 'text',
   },
 );
+db.collection('users').createIndex(
+  {
+    name: 'text',
+    email: 'text',
+  },
+);
 export { db, usersCollection };
