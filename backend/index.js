@@ -25,7 +25,7 @@ if (process.env.FIREBASE_AUTH_EMULATOR_HOST !== undefined) {
 } else {
   initializeApp({
     credential: cert(
-      JSON.parse(process.env.FIREBASE_CONFIG.replace(/\\n/g, '\n'),),
+      JSON.parse(process.env.FIREBASE_CONFIG),
     ),
   });
 }
