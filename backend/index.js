@@ -238,7 +238,7 @@ app.get('/api/classes_search', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
   const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } },
     { score: { $meta: 'textScore' }, courseID: 1, title: 1 }).sort({ score: { $meta: 'textScore' } }).toArray();
-  res.send(results.slice(0, 5)); // returns the top 5 most relevant courses
+  res.send({ results: results.slice(0, 5) }); // returns the top 5 most relevant courses
 });
 
 app.get('/api/class/:classID/user_search', async (req, res) => {
