@@ -46,6 +46,7 @@
 <script>
 import { roomsRef, usersRef, firebase } from '../firestore';
 import ChatContainer from '../ChatContainer.vue';
+import { axiosInstance } from '../utils/axiosInstance';
 
 export default {
   components: {
@@ -60,7 +61,7 @@ export default {
       isDevice: false,
       showDemoOptions: true,
       updatingData: false,
-      classData: {}
+      classData: {},
     };
   },
 
@@ -79,8 +80,7 @@ export default {
   async beforeRouteUpdate(to, from, next) {
     this.classData = (await axiosInstance.get(`class/${to.id}`)).data;
   },
-  
-  mounted() {
+  async mounted() {
     this.isDevice = window.innerWidth < 500;
     window.addEventListener('resize', (ev) => {
       if (ev.isTrusted) this.isDevice = window.innerWidth < 500;
