@@ -7,6 +7,7 @@ import path from 'path';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
+import { ObjectId } from 'mongodb';
 import { db, usersCollection } from './mongodb.js';
 import toAsyncApp from './asyncApp.js';
 
@@ -47,7 +48,7 @@ async function verify(token) {
 
 // This will ensure that the user is authorized for all endpoints except for the authentication endpoint
 app.use(async (req, res, next) => {
-  if (req.path === AUTH_ENDPOINT || req.path === CLASS_ENDPOINT) {
+  if (req.path === AUTH_ENDPOINT) {
     next();
     return;
   }
@@ -61,8 +62,6 @@ app.use(async (req, res, next) => {
     res.status(401).send({ error: 'could_not_authenticate_token' });
   }
 });
-
-
 
 // const login = express();
 // build multiple CRUD interfaces:
@@ -196,9 +195,7 @@ app.post('/api/add-recent-classes', async (req, res) => {
   if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
     (await getClasses(quarter)).forEach(async (el) => {
       const id = uuidv4();
-      el.roomId = id;
-      el.roomName = el.courseID;
-      el.users = ['127.0.0.1'];
+      el.students = [];
       await db.collection(`courses_${quarter}`).insertOne(el);
     });
   }
@@ -213,6 +210,23 @@ app.post('/api/add-recent-classes', async (req, res) => {
   res.status(200).send();
 });
 
+app.get('/api/class/:classID', async (req, res) => {
+  const quarter = await getMostCurrentQuarter();
+  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  if (classObj !== null) { return res.send(classObj); }
+  return res.sendStatus(404);
+});
+
+app.put('/api/class/:classID/users', async (req, res) => {
+  const decodedToken = req.user;
+  const quarter = await getMostCurrentQuarter();
+  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  if (classObj === null) { return res.sendStatus(404); }
+  classObj.students.append(decodedToken.uid);
+  await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(req.params.classID) }, classObj);
+  return res.send(200);
+});
+
 app.get('/api/currentQuarter', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
   res.send({ quarter });
@@ -222,10 +236,18 @@ app.get('/api/currentQuarter', async (req, res) => {
 app.get('/api/classes_search', async (req, res) => {
   const { course } = req.query;
   console.log(`QUERY CLASS:    ${course}`);
-
   const quarter = await getMostCurrentQuarter();
-  const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } }, { score: { $meta: 'textScore' }, courseID: 1, title: 1 }).sort({ score: { $meta: 'textScore' } }).toArray();
+  const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } },
+    { score: { $meta: 'textScore' }, courseID: 1, title: 1 }).sort({ score: { $meta: 'textScore' } }).toArray();
   res.send(results.slice(0, 5)); // returns the top 5 most relevant courses
+});
+
+app.get('/api/class/:classID/user_search', async (req, res) => {
+  const { searchText } = req.query;
+  const quarter = await getMostCurrentQuarter();
+  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  const results = await db.collection('users').find({ uid: { $in: classObj.students }, $text: { $search: searchText } }, { score: { $meta: 'textScore' } }).sort({ score: { $meta: 'textScore' } }).toArray();
+  res.send(results.slice(0, 10)); // returns the top 5 most relevant courses
 });
 
 app.use('/', express.static(path.join(path.dirname(DIRNAME), '/dist')));
