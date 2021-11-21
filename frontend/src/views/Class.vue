@@ -69,6 +69,7 @@
 import { roomsRef, usersRef, firebase } from '../firestore';
 import ChatContainer from '../ChatContainer.vue';
 import { axiosInstance } from '../utils/axiosInstance';
+import store from '../store/index';
 
 export default {
   components: {
@@ -113,6 +114,7 @@ export default {
   methods: {
     async putUserInClass() {
       await axiosInstance.put((`class/${this.$route.params.id}/users`), firebase.auth().currentUser.uid);
+      this.$store.commit('insertClass', this.classData);
       this.isUserInClass = true;
     },
   },
