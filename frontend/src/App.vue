@@ -28,6 +28,21 @@
           v-if="isLoggedIn"
           class="ms-auto"
         >
+          <b-nav-item>
+            <b-nav-item-dropdown
+              text="My classes"
+              right
+            >
+              <li
+                v-for="classes in getClasses"
+                :key="classes._id"
+              >
+                <b-dropdown-item :to="`/class/${classes._id}`">
+                  {{ classes.courseID }}
+                </b-dropdown-item>
+              </li>
+            </b-nav-item-dropdown>
+          </b-nav-item>
           <b-nav-item to="UserProfile">
             <b-img
               :src="`${photoURL}`"
@@ -46,13 +61,21 @@
 
 <script>
 import { firebase } from '@/firestore';
+import { axiosInstance } from './utils/axiosInstance';
 
 export default {
   data() {
     return {
       photoURL: '',
       isLoggedIn: false,
+      myClasses: [],
+      gotClasses: false,
     };
+  },
+  computed: {
+    getClasses() {
+      return this.$store.getters.getClasses;
+    },
   },
   watch: {
     $route: {
@@ -67,19 +90,36 @@ export default {
       deep: true,
     },
   },
-  beforeRouteUpdate() {
+  async beforeRouteUpdate() {
     const user = firebase.auth().currentUser;
     console.log(user);
+
     if (user !== null) {
+      if (!this.gotClasses) {
+        const classArray = (await axiosInstance.get('users/getClasses')).data;
+        classArray.forEach((el) => {
+          this.$store.commit('insertClass', el);
+        });
+        this.gotClasses = true;
+      }
       this.isLoggedIn = true;
       this.photoURL = user.photoURL;
     }
   },
-  mounted() {
+  async mounted() {
     const user = firebase.auth().currentUser;
     if (user !== null) {
       this.isLoggedIn = true;
       this.photoURL = user.photoURL;
+      if (!this.gotClasses) {
+        const classArray = (await axiosInstance.get('users/getClasses')).data;
+        classArray.forEach((el) => {
+          this.$store.commit('insertClass', el);
+          console.log(this.getClasses);
+        });
+
+        this.gotClasses = true;
+      }
     }
   },
 };

@@ -220,9 +220,16 @@ app.put('/api/class/:classID/users', async (req, res) => {
   const decodedToken = req.user;
   const quarter = await getMostCurrentQuarter();
   const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  const userUID = decodedToken.uid;
   if (classObj === null) { return res.sendStatus(404); }
-  classObj.students.push(decodedToken.uid);
+  classObj.students.push(userUID);
   await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(req.params.classID) }, classObj);
+  const user = await db.collection('users').findOne({ uid: userUID });
+  if (user.classes === undefined) {
+    user.classes = [];
+  }
+  user.classes.push(req.params.classID);
+  await db.collection('users').replaceOne({ uid: userUID }, user);
   return res.send(200);
 });
 
@@ -254,7 +261,23 @@ async function getClassByOid(Oid) {
   console.log(new ObjectId(Oid));
   return db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(Oid) });
 }
-
+app.get('/api/users/getClasses', async (req, res) => {
+  const decodedToken = req.user;
+  const userUID = decodedToken.uid;
+  const user = await db.collection('users').findOne({ uid: userUID });
+  const classObj = [];
+  if(user.classes === undefined)
+  {
+    res.send([]);
+    return;
+  }
+  // console.log(user.classes.size);
+  for (let i = 0; i < user.classes.length; i += 1) {
+    classObj.push(await getClassByOid(user.classes[i]));
+    console.log(classObj);
+  }
+  res.send(classObj);
+});
 /* app.post('/api/class/:classId/chat_rooms', async (req, res) => {
   if (validateChatRoomBody(req) === false) return res.sendStatus(422);
   const { classId } = req.params;
