@@ -11,7 +11,7 @@ Team: Kenneth Wang [x], Joshua Avery [x], Jamie Wang [x], Jennice Xu [x], Anisha
 Lead + Scribe: Jennice Xu
 
 Existing issues to fix:
-1. We need a signout button. 
+1. We need a signout button. (The button should signout automatically and refresh)
 2. When we create a chatroom, the current roomname is "Myself," and we need to change that to corresponding coursename.
 3. We should allow the user to change the chatroom name.
 4. We cannot invite users or leave the chatroom.
