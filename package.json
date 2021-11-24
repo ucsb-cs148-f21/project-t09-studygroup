@@ -8,7 +8,8 @@
     "start:dev": "cross-env FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 nodemon -r dotenv/config ./backend/index.js --watch ./backend",
     "build": "vue-cli-service build ./frontend/src/main.js",
     "lint": "vue-cli-service lint ./frontend/src",
-    "start": "node ./backend/index.js"
+    "start": "node ./backend/index.js",
+    "firebase": "firebase emulators:start --export-on-exit=./firebase_emulator_data --import=./firebase_emulator_data"
   },
   "jest": {
     "testEnvironment": "node",

@@ -233,6 +233,21 @@ app.put('/api/class/:classID/users', async (req, res) => {
   return res.send(200);
 });
 
+app.delete('/api/class/:classID/users', async (req, res) => {
+  const decodedToken = req.user;
+  const quarter = await getMostCurrentQuarter();
+  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  const userUID = decodedToken.uid;
+  const user = await db.collection('users').findOne({ uid: userUID });
+  if (classObj === null) { return res.sendStatus(404); }
+  if (user === null) { return res.sendStatus(404); }
+  classObj.students = classObj.students.filter((element) => element !== decodedToken.uid);
+  await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(req.params.classID) }, classObj);
+  user.classes = user.classes.filter((element) => element !== req.params.classID);
+  await db.collection('users').replaceOne({ uid: userUID }, user);
+  return res.send(200);
+});
+
 app.get('/api/currentQuarter', async (req, res) => {
   const quarter = await getMostCurrentQuarter();
   res.send({ quarter });
@@ -266,8 +281,7 @@ app.get('/api/users/getClasses', async (req, res) => {
   const userUID = decodedToken.uid;
   const user = await db.collection('users').findOne({ uid: userUID });
   const classObj = [];
-  if(user.classes === undefined)
-  {
+  if (user.classes === undefined) {
     res.send([]);
     return;
   }
@@ -278,6 +292,13 @@ app.get('/api/users/getClasses', async (req, res) => {
   }
   res.send(classObj);
 });
+
+app.get('/api/users/:userID', async (req, res) => {
+  const userObj = await db.collection('users').findOne({ uid: req.params.userID });
+  if (userObj !== null) { return res.send(userObj); }
+  return res.sendStatus(404);
+});
+
 /* app.post('/api/class/:classId/chat_rooms', async (req, res) => {
   if (validateChatRoomBody(req) === false) return res.sendStatus(422);
   const { classId } = req.params;

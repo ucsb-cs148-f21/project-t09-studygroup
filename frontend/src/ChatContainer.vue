@@ -42,9 +42,7 @@
       ok-only
       ok-title="Cancel"
     >
-      <add-users
-        @create-room="addRoom"
-      />
+      <add-users @create-room="addRoom" />
     </b-modal>
 
     <b-modal
@@ -171,8 +169,11 @@ export default {
   methods: {
     async fetchClassDoc(classId) {
       this.resetRooms();
-      const { quarter } = (await axios.get(`${this.$API_BASE}currentQuarter`)).data;
-      this.classDoc = [(await db.collection(`courses_${quarter}`).doc(classId).get()).data()];
+      const { quarter } = (await axios.get(`${this.$API_BASE}currentQuarter`))
+        .data;
+      this.classDoc = [
+        (await db.collection(`courses_${quarter}`).doc(classId).get()).data(),
+      ];
       console.log(this.classDoc);
       console.log(this.classDoc);
     },
@@ -208,7 +209,8 @@ export default {
       if (this.endRooms && !this.startRooms) return (this.roomsLoaded = true);
       console.log(this.currentUserId);
       let query = roomsRef
-        .where('users', 'array-contains', this.currentUserId).where('classId', '==', this.$route.params.id)
+        .where('users', 'array-contains', this.currentUserId)
+        .where('classId', '==', this.$route.params.id)
         .orderBy('lastUpdated', 'desc')
         .limit(this.roomsPerPage);
 
@@ -353,7 +355,9 @@ export default {
     },
 
     formatTimestamp(date, timestamp) {
-      const timestampFormat = isSameDay(date, new Date()) ? 'HH:mm' : 'DD/MM/YY';
+      const timestampFormat = isSameDay(date, new Date())
+        ? 'HH:mm'
+        : 'DD/MM/YY';
       const result = parseTimestamp(timestamp, timestampFormat);
       return timestampFormat === 'HH:mm' ? `Today, ${result}` : result;
     },
@@ -416,7 +420,9 @@ export default {
     listenMessages(messages, room) {
       messages.forEach((message) => {
         const formattedMessage = this.formatMessage(room, message);
-        const messageIndex = this.messages.findIndex((m) => m._id === message.id);
+        const messageIndex = this.messages.findIndex(
+          (m) => m._id === message.id,
+        );
 
         if (messageIndex === -1) {
           this.messages = this.messages.concat([formattedMessage]);
@@ -524,9 +530,7 @@ export default {
         newMessage.files = deleteDbField;
       }
 
-      await messagesRef(roomId)
-        .doc(messageId)
-        .update(newMessage);
+      await messagesRef(roomId).doc(messageId).update(newMessage);
 
       /* if (files) {
         for (let index = 0; index < files.length; index++) {
@@ -570,9 +574,7 @@ export default {
       await uploadFileRef.put(file.blob, { contentType: type });
       const url = await uploadFileRef.getDownloadURL();
 
-      const messageDoc = await messagesRef(roomId)
-        .doc(messageId)
-        .get();
+      const messageDoc = await messagesRef(roomId).doc(messageId).get();
 
       const { files } = messageDoc.data();
 
@@ -582,9 +584,7 @@ export default {
         }
       });
 
-      await messagesRef(roomId)
-        .doc(messageId)
-        .update({ files });
+      await messagesRef(roomId).doc(messageId).update({ files });
     },
 
     formattedFiles(files) {
@@ -801,11 +801,17 @@ export default {
       }
     },
 
+    // async quitClass(student){
+      
+    // },
+
     async createRoom() {
       this.disableForm = true;
 
       const usersRef = db.collection('users');
-      const snapshot = await usersRef.where('username', '==', this.addRoomUsername).get();
+      const snapshot = await usersRef
+        .where('username', '==', this.addRoomUsername)
+        .get();
       const { id } = snapshot.docs[0];
       await usersRef.doc(id).update({ _id: id });
       await roomsRef.add({
@@ -842,7 +848,9 @@ export default {
     removeUser(roomId) {
       this.resetForms();
       this.removeEnrollCode = roomId;
-      this.removeUsers = this.rooms.find((room) => room.roomId === roomId).users;
+      this.removeUsers = this.rooms.find(
+        (room) => room.roomId === roomId,
+      ).users;
     },
 
     async deleteRoomUser() {
