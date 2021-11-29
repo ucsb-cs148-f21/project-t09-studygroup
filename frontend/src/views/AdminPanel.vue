@@ -47,10 +47,11 @@
           Refresh to Other Quarter
         </b-button>
       </b-form>
-    </div>]
+    </div>
   </div>
 </template>
 <script>
+
 // import axios from 'axios';
 import { axiosInstance } from '../utils/axiosInstance';
 
@@ -61,6 +62,7 @@ export default {
         form: {
           year: '',
           season: '',
+          formattedQuarter: '',
         },
       };
     },
@@ -75,6 +77,19 @@ export default {
     async onSubmit(event) {
       event.preventDefault();
       this.getClassesByQuarter(this.year, this.season);
+    },
+    getFormattedQuarter(year, season) {
+      let formattedQuarter = year;
+      if (season === 'Fall') {
+        formattedQuarter += '4';
+      } else if (season === 'Winter') {
+        formattedQuarter += '1';
+      } else if (season === 'Spring') {
+        formattedQuarter += '2';
+      } else if (season === 'Summer') {
+        formattedQuarter += '3';
+      }
+      return formattedQuarter;
     },
   },
 

@@ -43,12 +43,12 @@
 
 <script>
 import {
+  getFormattedQuarter, year, season,
+} from '@/views/AdminPanel.vue';
+import {
   getFirestore, collection, query, where, getDocs,
 } from 'firebase/firestore';
 import { db } from '../firestore/index.js';
-import {
-  getFormattedQuarter, year, season,
-} from '../AdminPanel.vue';
 
 // @ is an alias to /src
 export default {
