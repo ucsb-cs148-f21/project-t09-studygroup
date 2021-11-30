@@ -33,13 +33,17 @@
 
         <div>
           <b-row class="justify-content-center">
+            <h3 class="text-center">
+              {{ courseID }}
+            </h3>
+            <p class="text-center w-75"> {{ courseDiscription }} </p>
             <b-button v-b-toggle.sidebar-1>
               See who's in the class
             </b-button>
           </b-row>
           <b-sidebar
             id="sidebar-1"
-            title="Your campanions"
+            title="Your companions"
             right
             shadow
           >
