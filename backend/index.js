@@ -271,6 +271,8 @@ app.get('/api/class/:classID/user_search', async (req, res) => {
   res.send({ results: results.slice(0, 10) }); // returns the top 5 most relevant courses
 });
 
+
+
 async function getClassByOid(Oid) {
   const quarter = await getMostCurrentQuarter();
   console.log(new ObjectId(Oid));
@@ -293,12 +295,13 @@ app.get('/api/users/getClasses', async (req, res) => {
   res.send(classObj);
 });
 
-app.get('/api/users/:userID', async (req, res) => {
-  const userObj = await db.collection('users').findOne({ uid: req.params.userID });
-  if (userObj !== null) { return res.send(userObj); }
-  return res.sendStatus(404);
-});
+app.get('/api/users/:userUID', async (req, res) => {
+  const { userUID } = req.params;
 
+  const user = await db.collection('users').findOne({ uid: userUID });
+  if (user === null) return res.sendStatus(404);
+  return res.send(user);
+});
 /* app.post('/api/class/:classId/chat_rooms', async (req, res) => {
   if (validateChatRoomBody(req) === false) return res.sendStatus(422);
   const { classId } = req.params;

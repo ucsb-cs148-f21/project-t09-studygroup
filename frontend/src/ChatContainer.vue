@@ -20,6 +20,7 @@
       :menu-actions="menuActions"
       :room-message="roomMessage"
       :templates-text="templatesText"
+      :show-files="false"
       @fetch-more-rooms="fetchMoreRooms"
       @fetch-messages="fetchMessages"
       @send-message="sendMessage"
@@ -65,7 +66,6 @@ import {
   roomsRef,
   messagesRef,
   usersRef,
-  filesRef,
   deleteDbField,
 } from '@/firestore';
 import { parseTimestamp, isSameDay } from '@/utils/dates';
@@ -126,6 +126,7 @@ export default {
         { name: 'inviteUser', title: 'Invite User' },
         { name: 'removeUser', title: 'Remove User' },
         { name: 'deleteRoom', title: 'Delete Room' },
+        { name: 'leaveRoom', title: 'Leave Room' },
       ],
       menuActions: [
         { name: 'inviteUser', title: 'Invite User' },
@@ -163,10 +164,12 @@ export default {
   mounted() {
     this.fetchRooms(this.$route.params.id);
     console.log(this.$route);
-    this.updateUserOnlineStatus();
   },
 
   methods: {
+    async getUser(id) {
+      return (await axiosInstance.get(`users/${id}`)).data;
+    },
     async fetchClassDoc(classId) {
       this.resetRooms();
       const { quarter } = (await axios.get(`${this.$API_BASE}currentQuarter`))
@@ -192,6 +195,7 @@ export default {
     },
 
     resetMessages() {
+      console.log('resetMessages');
       this.messages = [];
       this.messagesLoaded = false;
       this.startMessages = null;
@@ -228,7 +232,7 @@ export default {
       const roomUserIds = [];
       rooms.forEach((room) => {
         room.data().users.forEach((userId) => {
-          const foundUser = this.allUsers.find((user) => user?._id === userId);
+          const foundUser = this.allUsers.find((user) => user?.uid === userId);
           if (!foundUser && roomUserIds.indexOf(userId) === -1) {
             roomUserIds.push(userId);
           }
@@ -236,24 +240,25 @@ export default {
       });
 
       // this.incrementDbCounter('Fetch Room Users', roomUserIds.length)
-      const rawUsers = [];
+      let rawUsers = [];
       roomUserIds.forEach((userId) => {
-        const promise = usersRef
-          .doc(userId)
-          .get()
-          .then((user) => user.data());
+        if (userId === 'removed') return;
+        const promise = this.getUser(userId);
 
         rawUsers.push(promise);
       });
-
-      this.allUsers = [...this.allUsers, ...(await Promise.all(rawUsers))];
+      rawUsers = await Promise.all(rawUsers);
+      // eslint-disable-next-line no-param-reassign
+      rawUsers.forEach((elem) => { elem.username = elem.name; });
+      this.allUsers = [...this.allUsers, ...rawUsers];
 
       const roomList = {};
       rooms.forEach((room) => {
         roomList[room.id] = { ...room.data(), users: [] };
 
         room.data().users.forEach((userId) => {
-          const foundUser = this.allUsers.find((user) => user?._id === userId);
+          const foundUser = this.allUsers.find((user) => user?.uid === userId);
+          if (userId === 'removed') roomList[room.id].users.push({ username: '', _id: '' });
           if (foundUser) roomList[room.id].users.push(foundUser);
         });
       });
@@ -264,10 +269,10 @@ export default {
         const room = roomList[key];
 
         const roomContacts = room.users.filter(
-          (user) => user._id !== this.currentUserId,
+          (user) => user.uid !== this.currentUserId,
         );
 
-        room.roomName = roomContacts.map((user) => user.username).join(', ') || 'Myself';
+        room.roomName = roomContacts.map((user) => user.username).filter((name) => name !== '').join(', ') || 'Myself';
 
         const roomAvatar = roomContacts.length === 1 && roomContacts[0].avatar
           ? roomContacts[0].avatar
@@ -277,11 +282,11 @@ export default {
           ...room,
           roomId: key,
           avatar: roomAvatar,
-          index: room.lastUpdated.seconds,
+          index: room.lastUpdated?.seconds,
           lastMessage: {
             content: 'Room created',
             timestamp: this.formatTimestamp(
-              new Date(room.lastUpdated.seconds),
+              new Date(room.lastUpdated?.seconds),
               room.lastUpdated,
             ),
           },
@@ -296,7 +301,6 @@ export default {
         this.roomsLoadedCount = 0;
       }
 
-      this.listenUsersOnlineStatus(formattedRooms);
       this.listenRooms(query);
       // setTimeout(() => console.log('TOTAL', this.dbRequestCount), 2000)
     },
@@ -313,6 +317,7 @@ export default {
               (r) => room.roomId === r.roomId,
             );
             this.rooms[roomIndex].lastMessage = lastMessage;
+            console.log(lastMessage);
             this.rooms = [...this.rooms];
           });
           if (this.loadingLastMessageByRoom < this.rooms.length) {
@@ -331,11 +336,7 @@ export default {
     formatLastMessage(message) {
       if (!message.timestamp) return undefined;
 
-      let { content } = message;
-      if (message.files?.length) {
-        const file = message.files[0];
-        content = `${file.name}.${file.extension || file.type}`;
-      }
+      const { content } = message;
 
       return {
         ...message,
@@ -362,7 +363,8 @@ export default {
       return timestampFormat === 'HH:mm' ? `Today, ${result}` : result;
     },
 
-    fetchMessages({ room, options = {} }) {
+    async fetchMessages({ room, options = {} }) {
+      console.log(options);
       this.$emit('show-demo-options', false);
 
       if (options.reset) {
@@ -382,47 +384,46 @@ export default {
 
       this.selectedRoom = room.roomId;
 
-      query.get().then((messages) => {
-        // this.incrementDbCounter('Fetch Room Messages', messages.size)
-        if (this.selectedRoom !== room.roomId) return;
+      const messages = await query.get();
+      // this.incrementDbCounter('Fetch Room Messages', messages.size)
+      if (this.selectedRoom !== room.roomId) return;
 
-        if (messages.empty || messages.docs.length < this.messagesPerPage) {
-          setTimeout(() => (this.messagesLoaded = true), 0);
-        }
+      if (messages.empty || messages.docs.length < this.messagesPerPage) {
+        setTimeout(() => (this.messagesLoaded = true), 0);
+      }
 
-        if (this.startMessages) this.endMessages = this.startMessages;
-        this.startMessages = messages.docs[messages.docs.length - 1];
+      if (this.startMessages) this.endMessages = this.startMessages;
+      this.startMessages = messages.docs[messages.docs.length - 1];
 
-        let listenerQuery = ref.orderBy('timestamp');
+      let listenerQuery = ref.orderBy('timestamp');
 
-        if (this.startMessages) {
-          listenerQuery = listenerQuery.startAt(this.startMessages);
-        }
-        if (this.endMessages) {
-          listenerQuery = listenerQuery.endAt(this.endMessages);
-        }
+      if (this.startMessages) {
+        listenerQuery = listenerQuery.startAt(this.startMessages);
+      }
+      if (this.endMessages) {
+        listenerQuery = listenerQuery.endAt(this.endMessages);
+      }
 
-        if (options.reset) this.messages = [];
-
-        messages.forEach((message) => {
-          const formattedMessage = this.formatMessage(room, message);
-          this.messages.unshift(formattedMessage);
-        });
-
-        const listener = listenerQuery.onSnapshot((snapshots) => {
-          // this.incrementDbCounter('Listen Room Messages', snapshots.size)
-          this.listenMessages(snapshots, room);
-        });
-        this.listeners.push(listener);
+      if (options.reset) this.messages = [];
+      messages.forEach((message) => {
+        // eslint-disable-next-line no-await-in-loop
+        const formattedMessage = this.formatMessage(room, message);
+        this.messages.unshift(formattedMessage);
       });
+      this.messages = await Promise.all(this.messages);
+      console.log(this.messages);
+      const listener = listenerQuery.onSnapshot((snapshots) => {
+        // this.incrementDbCounter('Listen Room Messages', snapshots.size)
+        this.listenMessages(snapshots, room);
+      });
+      this.listeners.push(listener);
     },
 
-    listenMessages(messages, room) {
-      messages.forEach((message) => {
-        const formattedMessage = this.formatMessage(room, message);
-        const messageIndex = this.messages.findIndex(
-          (m) => m._id === message.id,
-        );
+    async listenMessages(messages, room) {
+      messages.forEach(async (message) => {
+        const formattedMessage = await this.formatMessage(room, message);
+        // eslint-disable-next-line no-underscore-dangle
+        const messageIndex = this.messages.findIndex((m) => m._id === message.id);
 
         if (messageIndex === -1) {
           this.messages = this.messages.concat([formattedMessage]);
@@ -448,10 +449,8 @@ export default {
       }
     },
 
-    formatMessage(room, message) {
-      const senderUser = room.users.find(
-        (user) => message.data().sender_id === user._id,
-      );
+    async formatMessage(room, message) {
+      const senderUser = await this.getUser(message.data().sender_id);
 
       const { timestamp } = message.data();
 
@@ -463,7 +462,7 @@ export default {
           seconds: timestamp.seconds,
           timestamp: parseTimestamp(timestamp, 'HH:mm'),
           date: parseTimestamp(timestamp, 'DD MMMM YYYY'),
-          username: senderUser ? senderUser.username : null,
+          username: senderUser ? senderUser.name : null,
           // avatar: senderUser ? senderUser.avatar : null,
           distributed: true,
         },
@@ -482,7 +481,7 @@ export default {
     },
 
     async sendMessage({
-      content, roomId, files, replyMessage,
+      content, roomId, replyMessage,
     }) {
       const message = {
         sender_id: this.currentUserId,
@@ -490,128 +489,34 @@ export default {
         timestamp: new Date(),
       };
 
-      /* if (files) {
-        message.files = this.formattedFiles(files);
-      } */
-
       if (replyMessage) {
         message.replyMessage = {
           _id: replyMessage._id,
           content: replyMessage.content,
           sender_id: replyMessage.senderId,
         };
-
-        /* if (replyMessage.files) {
-          message.replyMessage.files = replyMessage.files;
-        }
-        */
       }
 
       const { id } = await messagesRef(roomId).add(message);
-
-      /* if (files) {
-        for (let index = 0; index < files.length; index++) {
-          await this.uploadFile({ file: files[index], messageId: id, roomId });
-        }
-      } */
 
       roomsRef.doc(roomId).update({ lastUpdated: new Date() });
     },
 
     async editMessage({
-      messageId, newContent, roomId, files,
+      messageId, newContent, roomId,
     }) {
       const newMessage = { edited: new Date() };
       newMessage.content = newContent;
 
-      if (files) {
-        newMessage.files = this.formattedFiles(files);
-      } else {
-        newMessage.files = deleteDbField;
-      }
-
-      await messagesRef(roomId).doc(messageId).update(newMessage);
-
-      /* if (files) {
-        for (let index = 0; index < files.length; index++) {
-          if (files[index]?.blob) {
-            await this.uploadFile({ file: files[index], messageId, roomId });
-          }
-        }
-      } */
+      await messagesRef(roomId)
+        .doc(messageId)
+        .update(newMessage);
     },
 
     async deleteMessage({ message, roomId }) {
       await messagesRef(roomId)
         .doc(message._id)
         .update({ deleted: new Date() });
-
-      const { files } = message;
-
-      if (files) {
-        files.forEach((file) => {
-          const deleteFileRef = filesRef
-            .child(this.currentUserId)
-            .child(message._id)
-            .child(`${file.name}.${file.extension || file.type}`);
-
-          deleteFileRef.delete();
-        });
-      }
-    },
-
-    async uploadFile({ file, messageId, roomId }) {
-      let type = file.extension || file.type;
-      if (type === 'svg' || type === 'pdf') {
-        type = file.type;
-      }
-
-      const uploadFileRef = filesRef
-        .child(this.currentUserId)
-        .child(messageId)
-        .child(`${file.name}.${type}`);
-
-      await uploadFileRef.put(file.blob, { contentType: type });
-      const url = await uploadFileRef.getDownloadURL();
-
-      const messageDoc = await messagesRef(roomId).doc(messageId).get();
-
-      const { files } = messageDoc.data();
-
-      files.forEach((f) => {
-        if (f.url === file.localUrl) {
-          f.url = url;
-        }
-      });
-
-      await messagesRef(roomId).doc(messageId).update({ files });
-    },
-
-    formattedFiles(files) {
-      const formattedFiles = [];
-
-      files.forEach((file) => {
-        const messageFile = {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          extension: file.extension || file.type,
-          url: file.url || file.localUrl,
-        };
-
-        if (file.audio) {
-          messageFile.audio = true;
-          messageFile.duration = file.duration;
-        }
-
-        formattedFiles.push(messageFile);
-      });
-
-      return formattedFiles;
-    },
-
-    openFile({ file }) {
-      window.open(file.file.url, '_blank');
     },
 
     async openUserTag({ user }) {
@@ -674,6 +579,9 @@ export default {
           return this.removeUser(roomId);
         case 'deleteRoom':
           return this.deleteRoom(roomId);
+        case 'leaveRoom':
+          return this.leaveRoom(roomId);
+        default:
       }
     },
 
@@ -727,64 +635,6 @@ export default {
       this.roomsListeners.push(listener);
     },
 
-    updateUserOnlineStatus() {
-      const userStatusRef = firebase
-        .database()
-        .ref(`/status/${this.currentUserId}`);
-
-      const isOfflineData = {
-        state: 'offline',
-        lastChanged: firebase.database.ServerValue.TIMESTAMP,
-      };
-
-      const isOnlineData = {
-        state: 'online',
-        lastChanged: firebase.database.ServerValue.TIMESTAMP,
-      };
-
-      firebase
-        .database()
-        .ref('.info/connected')
-        .on('value', (snapshot) => {
-          if (snapshot.val() === false) return;
-
-          userStatusRef
-            .onDisconnect()
-            .set(isOfflineData)
-            .then(() => {
-              userStatusRef.set(isOnlineData);
-            });
-        });
-    },
-
-    listenUsersOnlineStatus(rooms) {
-      rooms.map((room) => {
-        room.users.map((user) => {
-          const listener = firebase
-            .database()
-            .ref(`/status/${user._id}`)
-            .on('value', (snapshot) => {
-              if (!snapshot || !snapshot.val()) return;
-
-              const lastChanged = this.formatTimestamp(
-                new Date(snapshot.val().lastChanged),
-                new Date(snapshot.val().lastChanged),
-              );
-
-              user.status = { ...snapshot.val(), lastChanged };
-
-              const roomIndex = this.rooms.findIndex(
-                (r) => room.roomId === r.roomId,
-              );
-
-              this.rooms[roomIndex] = room;
-              this.rooms = [...this.rooms];
-            });
-          this.roomsListeners.push(listener);
-        });
-      });
-    },
-
     async addRoom(uidArray) {
       uidArray.push(this.currentUserId);
       try {
@@ -800,27 +650,13 @@ export default {
         this.chatRoomCreationError = true;
       }
     },
-
-    // async quitClass(student){
-      
-    // },
-
-    async createRoom() {
-      this.disableForm = true;
-
-      const usersRef = db.collection('users');
-      const snapshot = await usersRef
-        .where('username', '==', this.addRoomUsername)
-        .get();
-      const { id } = snapshot.docs[0];
-      await usersRef.doc(id).update({ _id: id });
-      await roomsRef.add({
-        users: [id, this.currentUserId],
-        lastUpdated: new Date(),
+    async leaveRoom(roomID) {
+      await roomsRef.doc(roomID).update({
+        users: firebase.firestore.FieldValue.arrayRemove(this.currentUserId),
       });
-
-      this.addNewRoom = false;
-      this.addRoomUsername = '';
+      await roomsRef.doc(roomID).update({
+        users: firebase.firestore.FieldValue.arrayUnion('removed'),
+      });
       this.fetchRooms();
     },
 
@@ -904,77 +740,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/*
-.window-container {
-  width: 100%;
-}
-
-.window-mobile {
-  form {
-    padding: 0 10px 10px;
-  }
-}
-
-form {
-  padding-bottom: 20px;
-}
-
-input {
-  padding: 5px;
-  width: 140px;
-  height: 21px;
-  border-radius: 4px;
-  border: 1px solid #d2d6da;
-  outline: none;
-  font-size: 14px;
-  vertical-align: middle;
-
-  &::placeholder {
-    color: #9ca6af;
-  }
-}
-
-button {
-  background: #1976d2;
-  color: #fff;
-  outline: none;
-  cursor: pointer;
-  border-radius: 4px;
-  padding: 8px 12px;
-  margin-left: 10px;
-  border: none;
-  font-size: 14px;
-  transition: 0.3s;
-  vertical-align: middle;
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &:active {
-    opacity: 0.6;
-  }
-
-  &:disabled {
-    cursor: initial;
-    background: #c6c9cc;
-    opacity: 0.6;
-  }
-}
-
-.button-cancel {
-  color: #a8aeb3;
-  background: none;
-  margin-left: 5px;
-}
-
-select {
-  vertical-align: middle;
-  height: 33px;
-  width: 152px;
-  font-size: 13px;
-  margin: 0 !important;
-} */
-</style>

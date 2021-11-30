@@ -19,9 +19,6 @@
           <b-nav-item to="/AdminPanel">
             AdminPanel
           </b-nav-item>
-          <b-nav-item to="/About">
-            About
-          </b-nav-item>
           <b-nav-item @click="signout">
             Signout
           </b-nav-item>

@@ -24,7 +24,6 @@
     <div v-if="isUserInClass">
       <div
         class="app-container"
-        :class="{ 'app-mobile': isDevice, 'app-mobile-dark': theme === 'dark' }"
       >
         <!-- <div>
                 <button @click="resetData">Clear Data</button>
@@ -36,10 +35,17 @@
             <h3 class="text-center">
               {{ courseID }}
             </h3>
-            <p class="text-center w-75"> {{ courseDiscription }} </p>
-            <b-button v-b-toggle.sidebar-1>
-              See who's in the class
-            </b-button>
+            <b-col>
+              <p class="text-center w-75">
+                {{ courseDiscription }}
+              </p>
+            </b-col>
+            <b-col>
+              <b-button v-b-toggle.sidebar-1>
+                See who's in the class
+              </b-button>
+              <b-col />
+            </b-col>
           </b-row>
           <b-sidebar
             id="sidebar-1"
@@ -69,51 +75,49 @@
         </div>
         <div>
           <b-button
-            id="show-btn"
-            variant="outline-danger"
-            squared
-            @click="showModal"
+            class="button-light"
+            @click="theme = 'light'"
           >
-            Quit Class
+            Light
           </b-button>
-          <b-modal
-            ref="my-modal"
-            hide-footer
-            title="Are you sure you want to quit?"
+          <b-button
+            class="button-dark"
+            @click="theme = 'dark'"
           >
-            <div class="d-block text-center">
-              <h5>If you quit the class, you will also quit the chat room</h5>
-            </div>
+            Dark
+          </b-button>
+          <div>
             <b-button
-              class="mt-3"
+              id="show-btn"
               variant="outline-danger"
-              block
-              @click="userWantToQuit"
+              squared
+              @click="showModal"
             >
-              Yes, quit
+              Quit Class
             </b-button>
-            <br>
-            <b-button
-              class="mt-3"
-              variant="outline-warning"
-              block
-              @click="hideModal"
+            <b-modal
+              ref="my-modal"
+              ok-title="Yes"
+              @ok="userWantToQuit"
             >
-              No, don't quit
-            </b-button>
-          </b-modal>
-        </div>
-        <chat-container
-          v-if="showChat"
-          :current-user-id="currentUserId"
-          :theme="theme"
-          :is-device="isDevice"
-          @show-demo-options="showDemoOptions = $event"
-        />
+              <div class="d-block text-center">
+                <h5> Are you sure you want to quit? If you quit the class, you will also quit all the chat rooms in this class</h5>
+              </div>
+            </b-modal>
+          </div>
+          <chat-container
+            v-if="showChat"
+            :key="$route.params.id"
+            :current-user-id="currentUserId"
+            :theme="theme"
+            :is-device="isDevice"
+            @show-demo-options="showDemoOptions = $event"
+          />
 
-        <!-- <div class="version-container">
+          <!-- <div class="version-container">
                 v1.0.0
             </div> -->
+        </div>
       </div>
     </div>
   </div>
@@ -159,24 +163,28 @@ export default {
     window.addEventListener('resize', (ev) => {
       if (ev.isTrusted) this.isDevice = window.innerWidth < 500;
     });
-    this.currentUserId = firebase.auth().currentUser.uid;
-    console.log(firebase.auth().currentUser);
-    this.classData = (
-      await axiosInstance.get(`class/${this.$route.params.id}`)
-    ).data;
-    this.isUserInClass = this.classData.students.includes(this.currentUserId);
-    this.courseID = this.classData.courseID;
-    this.courseDiscription = this.classData.description;
-
-    const uidArray = this.classData.students;
-    uidArray.forEach(async (el) => {
-      this.userArray.push((await axiosInstance.get(`users/${el}`)).data);
-    });
-
+    await this.initData(this.$route.params.id);
     this.showChat = true;
     this.isLoaded = true;
   },
   methods: {
+    async initData(classId) {
+      console.log(classId);
+      this.currentUserId = firebase.auth().currentUser.uid;
+      console.log(firebase.auth().currentUser);
+      this.classData = (
+        await axiosInstance.get(`class/${classId}`)
+      ).data;
+      this.isUserInClass = this.classData.students.includes(this.currentUserId);
+      this.courseID = this.classData.courseID;
+      this.courseDiscription = this.classData.description;
+
+      const uidArray = this.classData.students;
+      uidArray.forEach(async (el) => {
+        this.userArray.push((axiosInstance.get(`users/${el}`)).then((resp) => resp.data));
+      });
+      this.userArray = await Promise.all(this.userArray);
+    },
     showModal() {
       this.$refs['my-modal'].show();
     },
@@ -193,7 +201,7 @@ export default {
     },
     async userWantToQuit() {
       this.wantQuit = true;
-      await axiosInstance.delete(`class/${this.$route.params.id}/users`,firebase.auth().currentUser.uid,);
+      await axiosInstance.delete(`class/${this.$route.params.id}/users`, firebase.auth().currentUser.uid);
       this.isUserInClass = false;
     },
   },
@@ -204,13 +212,12 @@ export default {
     },
   }, */
   async beforeRouteUpdate(to, from, next) {
-    this.classData = (await axiosInstance.get(`class/${to.id}`)).data;
-    this.isUserInClass = this.classData.students.includes(this.currentUserId);
-
-    const uidArray = this.classData.students;
-    uidArray.forEach(async (el) => {
-      this.userArray.push((await axiosInstance.get(`users/${el}`)).data);
-    });
+    this.showChat = false;
+    this.isLoaded = false;
+    await this.initData(to.params.id)
+    next();
+    this.showChat = true;
+    this.isLoaded = true;
   },
 };
 </script>
