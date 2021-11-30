@@ -24,7 +24,6 @@
     <div v-if="isUserInClass">
       <div
         class="app-container"
-        :class="{ 'app-mobile': isDevice, 'app-mobile-dark': theme === 'dark' }"
       >
         <!-- <div>
                 <button @click="resetData">Clear Data</button>
@@ -49,13 +48,16 @@
           </b-button>
           <div>
             <b-row class="justify-content-center">
-              <b-button v-b-toggle.sidebar-1>
-                See who's in the class
-              </b-button>
+              <b-col>
+                <b-button v-b-toggle.sidebar-1>
+                  See who's in the class
+                </b-button>
+                <b-col />
+              </b-col>
             </b-row>
             <b-sidebar
               id="sidebar-1"
-              title="Your campanions"
+              title="Your companions"
               right
               shadow
             >
@@ -90,29 +92,12 @@
             </b-button>
             <b-modal
               ref="my-modal"
-              hide-footer
-              title="Are you sure you want to quit?"
+              ok-title="Yes"
+              @ok="userWantToQuit"
             >
               <div class="d-block text-center">
-                <h5>If you quit the class, you will also quit the chat room</h5>
+                <h5> Are you sure you want to quit? If you quit the class, you will also quit all the chat rooms in this class</h5>
               </div>
-              <b-button
-                class="mt-3"
-                variant="outline-danger"
-                block
-                @click="userWantToQuit"
-              >
-                Yes, quit
-              </b-button>
-              <br>
-              <b-button
-                class="mt-3"
-                variant="outline-warning"
-                block
-                @click="hideModal"
-              >
-                No, don't quit
-              </b-button>
             </b-modal>
           </div>
           <chat-container
