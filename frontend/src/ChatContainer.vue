@@ -43,9 +43,7 @@
       ok-only
       ok-title="Cancel"
     >
-      <add-users
-        @create-room="addRoom"
-      />
+      <add-users @create-room="addRoom" />
     </b-modal>
 
     <b-modal
@@ -174,8 +172,11 @@ export default {
     },
     async fetchClassDoc(classId) {
       this.resetRooms();
-      const { quarter } = (await axios.get(`${this.$API_BASE}currentQuarter`)).data;
-      this.classDoc = [(await db.collection(`courses_${quarter}`).doc(classId).get()).data()];
+      const { quarter } = (await axios.get(`${this.$API_BASE}currentQuarter`))
+        .data;
+      this.classDoc = [
+        (await db.collection(`courses_${quarter}`).doc(classId).get()).data(),
+      ];
       console.log(this.classDoc);
       console.log(this.classDoc);
     },
@@ -212,7 +213,8 @@ export default {
       if (this.endRooms && !this.startRooms) return (this.roomsLoaded = true);
       console.log(this.currentUserId);
       let query = roomsRef
-        .where('users', 'array-contains', this.currentUserId).where('classId', '==', this.$route.params.id)
+        .where('users', 'array-contains', this.currentUserId)
+        .where('classId', '==', this.$route.params.id)
         .orderBy('lastUpdated', 'desc')
         .limit(this.roomsPerPage);
 
@@ -354,7 +356,9 @@ export default {
     },
 
     formatTimestamp(date, timestamp) {
-      const timestampFormat = isSameDay(date, new Date()) ? 'HH:mm' : 'DD/MM/YY';
+      const timestampFormat = isSameDay(date, new Date())
+        ? 'HH:mm'
+        : 'DD/MM/YY';
       const result = parseTimestamp(timestamp, timestampFormat);
       return timestampFormat === 'HH:mm' ? `Today, ${result}` : result;
     },
@@ -417,7 +421,6 @@ export default {
 
     async listenMessages(messages, room) {
       messages.forEach(async (message) => {
-        // eslint-disable-next-line no-await-in-loop
         const formattedMessage = await this.formatMessage(room, message);
         // eslint-disable-next-line no-underscore-dangle
         const messageIndex = this.messages.findIndex((m) => m._id === message.id);
@@ -681,7 +684,9 @@ export default {
     removeUser(roomId) {
       this.resetForms();
       this.removeEnrollCode = roomId;
-      this.removeUsers = this.rooms.find((room) => room.roomId === roomId).users;
+      this.removeUsers = this.rooms.find(
+        (room) => room.roomId === roomId,
+      ).users;
     },
 
     async deleteRoomUser() {
