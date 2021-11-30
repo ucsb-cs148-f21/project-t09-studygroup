@@ -30,10 +30,50 @@
                 <button @click="addData" :disabled="updatingData">Add Data</button>
             </div> -->
 
-        <div
-          v-if="showOptions"
-          class="button-theme"
-        >
+        <div>
+          <b-row class="justify-content-center">
+            <h3 class="text-center">
+              {{ courseID }}
+            </h3>
+            <b-col>
+              <p class="text-center w-75">
+                {{ courseDiscription }}
+              </p>
+            </b-col>
+            <b-col>
+              <b-button v-b-toggle.sidebar-1>
+                See who's in the class
+              </b-button>
+              <b-col />
+            </b-col>
+          </b-row>
+          <b-sidebar
+            id="sidebar-1"
+            title="Your companions"
+            right
+            shadow
+          >
+            <div class="px-3 py-2">
+              <li
+                v-for="students in userArray"
+                :key="students.uid"
+              >
+                <b-card
+                  href="#"
+                  :title="students.name"
+                >
+                  <b-avatar
+                    variant="info"
+                    :src="students.picture"
+                    class="mr-3"
+                  />
+                  {{ students.email }}
+                </b-card>
+              </li>
+            </div>
+          </b-sidebar>
+        </div>
+        <div>
           <b-button
             class="button-light"
             @click="theme = 'light'"
@@ -46,41 +86,6 @@
           >
             Dark
           </b-button>
-          <div>
-            <b-row class="justify-content-center">
-              <b-col>
-                <b-button v-b-toggle.sidebar-1>
-                  See who's in the class
-                </b-button>
-                <b-col />
-              </b-col>
-            </b-row>
-            <b-sidebar
-              id="sidebar-1"
-              title="Your companions"
-              right
-              shadow
-            >
-              <div class="px-3 py-2">
-                <li
-                  v-for="students in userArray"
-                  :key="students.uid"
-                >
-                  <b-card
-                    href="#"
-                    :title="students.name"
-                  >
-                    <b-avatar
-                      variant="info"
-                      :src="students.picture"
-                      class="mr-3"
-                    />
-                    {{ students.email }}
-                  </b-card>
-                </li>
-              </div>
-            </b-sidebar>
-          </div>
           <div>
             <b-button
               id="show-btn"
@@ -108,7 +113,7 @@
             @show-demo-options="showDemoOptions = $event"
           />
 
-        <!-- <div class="version-container">
+          <!-- <div class="version-container">
                 v1.0.0
             </div> -->
         </div>
