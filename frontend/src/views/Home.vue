@@ -1,8 +1,5 @@
 <template>
   <div>
-    <div class="center">
-      <p>Welcome !</p>
-    </div>
     <div id="search-form">
       <b-form
         v-if="show"
@@ -10,9 +7,8 @@
       >
         <b-form-group
           id="input-group-1"
-          label="Course:"
           label-for="input-1"
-          description="Enter the course id you are searching for (e.g. ANTH 3). The id is case-sensitive."
+          description="Enter the course id or related terms you are searching for (e.g. ANTH 3)."
         >
           <b-form-input
             id="input-1"
@@ -34,10 +30,12 @@
           v-for="link in links"
           :key="link._id"
         >
-        <router-link :to="`/class/${link._id}`"> {{link.courseID}} </router-link>
-        <p>
-        {{link.description}}
-        </p>
+          <router-link :to="`/class/${link._id}`">
+            {{ link.courseID }}
+          </router-link>
+          <p>
+            {{ link.description }}
+          </p>
           <!-- <p v-html="link.message" /> -->
         </li>
       </ul>
@@ -75,13 +73,13 @@ export default {
       // console.log(str);
       console.log(this.links);
       // const courseLink = `${window.location.origin}/class/${this.info._id}`;
-    // async onSubmit(event) {
-    //   this.links = [];
-    //   event.preventDefault();
-    //   const searchText = this.course;
+      // async onSubmit(event) {
+      //   this.links = [];
+      //   event.preventDefault();
+      //   const searchText = this.course;
 
-    //   // search firebase for course
-    //   const q = query(collection(db, 'courses_20214'), where('courseID', '==', courseName));
+      //   // search firebase for course
+      //   const q = query(collection(db, 'courses_20214'), where('courseID', '==', courseName));
 
     //   const querySnapshot = await getDocs(q);
     //   querySnapshot.forEach((doc) => {

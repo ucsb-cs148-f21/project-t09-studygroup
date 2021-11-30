@@ -35,18 +35,18 @@
           v-if="showOptions"
           class="button-theme"
         >
-          <button
+          <b-button
             class="button-light"
             @click="theme = 'light'"
           >
             Light
-          </button>
-          <button
+          </b-button>
+          <b-button
             class="button-dark"
             @click="theme = 'dark'"
           >
             Dark
-          </button>
+          </b-button>
         </div>
 
         <chat-container
