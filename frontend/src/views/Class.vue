@@ -107,6 +107,7 @@
           </div>
           <chat-container
             v-if="showChat"
+            :key="$route.params.id"
             :current-user-id="currentUserId"
             :theme="theme"
             :is-device="isDevice"
@@ -162,24 +163,28 @@ export default {
     window.addEventListener('resize', (ev) => {
       if (ev.isTrusted) this.isDevice = window.innerWidth < 500;
     });
-    this.currentUserId = firebase.auth().currentUser.uid;
-    console.log(firebase.auth().currentUser);
-    this.classData = (
-      await axiosInstance.get(`class/${this.$route.params.id}`)
-    ).data;
-    this.isUserInClass = this.classData.students.includes(this.currentUserId);
-    this.courseID = this.classData.courseID;
-    this.courseDiscription = this.classData.description;
-
-    const uidArray = this.classData.students;
-    uidArray.forEach(async (el) => {
-      this.userArray.push((await axiosInstance.get(`users/${el}`)).data);
-    });
-
+    await this.initData(this.$route.params.id);
     this.showChat = true;
     this.isLoaded = true;
   },
   methods: {
+    async initData(classId) {
+      console.log(classId);
+      this.currentUserId = firebase.auth().currentUser.uid;
+      console.log(firebase.auth().currentUser);
+      this.classData = (
+        await axiosInstance.get(`class/${classId}`)
+      ).data;
+      this.isUserInClass = this.classData.students.includes(this.currentUserId);
+      this.courseID = this.classData.courseID;
+      this.courseDiscription = this.classData.description;
+
+      const uidArray = this.classData.students;
+      uidArray.forEach(async (el) => {
+        this.userArray.push((axiosInstance.get(`users/${el}`)).then((resp) => resp.data));
+      });
+      this.userArray = await Promise.all(this.userArray);
+    },
     showModal() {
       this.$refs['my-modal'].show();
     },
@@ -207,13 +212,12 @@ export default {
     },
   }, */
   async beforeRouteUpdate(to, from, next) {
-    this.classData = (await axiosInstance.get(`class/${to.id}`)).data;
-    this.isUserInClass = this.classData.students.includes(this.currentUserId);
-
-    const uidArray = this.classData.students;
-    uidArray.forEach(async (el) => {
-      this.userArray.push((await axiosInstance.get(`users/${el}`)).data);
-    });
+    this.showChat = false;
+    this.isLoaded = false;
+    await this.initData(to.params.id)
+    next();
+    this.showChat = true;
+    this.isLoaded = true;
   },
 };
 </script>
