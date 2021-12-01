@@ -23,3 +23,4 @@ What advice would you give to the next person leading a retro based on what you 
 * I would advise the next person leading a retro to have everyone share their ideas on what they want to improve, so the group can hear everyone's perspectives and have an open discussion on how to make progress towards those improvements.
   
 ## Outcome of Retro Experiment
+We have been communicating our progress more in Slack, so everyone knows what new changes have been made to the app. Everyone has issues to work on, so the team has been productive.
