@@ -1,10 +1,7 @@
 <template>
   <div>
     <div id="search-form">
-      <b-form
-        v-if="show"
-        @submit="onSubmit"
-      >
+      <b-form v-if="show" @submit="onSubmit" class="justify-content-center">
         <b-form-group
           id="input-group-1"
           label-for="input-1"
@@ -17,19 +14,12 @@
             required
           />
         </b-form-group>
-        <b-button
-          id="submit"
-          type="submit"
-          variant="primary"
-        >
+        <b-button id="submit" type="submit" variant="primary">
           Submit
         </b-button>
       </b-form>
       <ul id="chat-room-links">
-        <li
-          v-for="link in links"
-          :key="link._id"
-        >
+        <li v-for="link in links" :key="link._id">
           <router-link :to="`/class/${link._id}`">
             {{ link.courseID }}
           </router-link>
@@ -45,18 +35,17 @@
 
 <script>
 // import axios from 'axios';
-import { axiosInstance } from '../utils/axiosInstance';
+import { axiosInstance } from "../utils/axiosInstance";
 // @ is an alias to /src
 export default {
-  name: 'Home',
-  components: {
-  },
+  name: "Home",
+  components: {},
   data() {
     return {
       form: {
-        course: '',
+        course: "",
       },
-      titlemessage: 'coursename: ',
+      titlemessage: "coursename: ",
       links: [],
       show: true,
     };
@@ -68,7 +57,9 @@ export default {
       const userInput = JSON.stringify(this.form);
       const cname = JSON.parse(userInput).course;
 
-      this.links = (await axiosInstance.get(`classes_search?course=${cname}`)).data.results;
+      this.links = (
+        await axiosInstance.get(`classes_search?course=${cname}`)
+      ).data.results;
       // const str = JSON.stringify(this.links, null, 2);
       // console.log(str);
       console.log(this.links);
@@ -81,20 +72,19 @@ export default {
       //   // search firebase for course
       //   const q = query(collection(db, 'courses_20214'), where('courseID', '==', courseName));
 
-    //   const querySnapshot = await getDocs(q);
-    //   querySnapshot.forEach((doc) => {
-    //     console.log(doc.id, ' => ', doc.data());
-    //     const courseLink = `${window.location.origin}/class/${doc._id}`;
-    //     console.log(courseLink);
-    //     this.links.push({ message: `<a href='${courseLink}'>${courseLink}</a>` });
-    //   });
-    //   if (querySnapshot.empty) {
-    //     this.links.push({ message: '<p>Course Not Found</p>' });
-    //   }
+      //   const querySnapshot = await getDocs(q);
+      //   querySnapshot.forEach((doc) => {
+      //     console.log(doc.id, ' => ', doc.data());
+      //     const courseLink = `${window.location.origin}/class/${doc._id}`;
+      //     console.log(courseLink);
+      //     this.links.push({ message: `<a href='${courseLink}'>${courseLink}</a>` });
+      //   });
+      //   if (querySnapshot.empty) {
+      //     this.links.push({ message: '<p>Course Not Found</p>' });
+      //   }
     },
   },
 };
-
 </script>
 <style scoped>
 #search-form {
@@ -110,9 +100,8 @@ export default {
 li {
   list-style-type: none;
 }
-#chat-room-links{
+#chat-room-links {
   padding-top: 40px;
   padding-left: 0px;
 }
-
 </style>
