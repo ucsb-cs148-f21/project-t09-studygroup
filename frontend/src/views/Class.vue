@@ -30,8 +30,8 @@
                 <button @click="addData" :disabled="updatingData">Add Data</button>
             </div> -->
 
-        <div>
-          <div style="display: inline-block; justify-content: center; position: relative; width: 100%">
+        <div style>
+          <div style="display: inline-block; justify-content: center; position: relative; width: 100%;">
             <h3 style="padding-top: 5px; width: 30%; text-align: center; display: block; float: left; margin-left: 35%;">
               {{ courseID }}
             </h3>
@@ -41,10 +41,10 @@
               text="Actions"
               style="width: 100px; display: block; float: right; padding-left: 5px; padding-right: 5px;"
             >
-              <b-dropdown-item>Mode</b-dropdown-item>
-              <b-dropdown-item>Quit Class</b-dropdown-item>
+              <b-dropdown-item @click="changeDisplayMode"> {{ displayTheme }} </b-dropdown-item>
+              <b-dropdown-item @click="showModal">Quit Class</b-dropdown-item>
             </b-dropdown>
-            <b-button v-b-toggle.sidebar-1 style="width: 160px; display: block; float: right;">
+            <b-button shadow-none v-b-toggle.sidebar-1 style="width: 160px; display: block; float: right;">
               View Classmates
             </b-button>
           </div>
@@ -75,27 +75,7 @@
           </b-sidebar>
         </div>
         <div>
-          <b-button
-            class="button-light"
-            @click="theme = 'light'"
-          >
-            Light
-          </b-button>
-          <b-button
-            class="button-dark"
-            @click="theme = 'dark'"
-          >
-            Dark
-          </b-button>
           <div>
-            <b-button
-              id="show-btn"
-              variant="outline-danger"
-              squared
-              @click="showModal"
-            >
-              Quit Class
-            </b-button>
             <b-modal
               ref="my-modal"
               ok-title="Yes"
@@ -138,6 +118,7 @@ export default {
   data() {
     return {
       theme: 'light',
+      displayTheme: 'Dark Mode',
       courseDiscription: '',
       courseID: '',
       showChat: false,
@@ -191,6 +172,16 @@ export default {
     },
     hideModal() {
       this.$refs['my-modal'].hide();
+    },
+    changeDisplayMode() {
+      if (this.theme === 'light') {
+        this.displayTheme = 'Light Mode';
+        this.theme = 'dark';
+      }
+      else {
+        this.displayTheme = 'Dark Mode';
+        this.theme = 'light';
+      }
     },
     async putUserInClass() {
       await axiosInstance.put(
