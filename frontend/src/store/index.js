@@ -11,6 +11,9 @@ export default new Vuex.Store({
     insertClass(state, newclass) {
       state.myclasses.push(newclass);
     },
+    deleteClass(state, classUID) {
+      state.myclasses = state.myclasses.filter((element) => element._id !== classUID);
+    },
   },
   getters: {
     getClasses(state) {
