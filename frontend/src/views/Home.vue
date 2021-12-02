@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="search-form">
-      <b-form v-if="show" @submit="onSubmit" class="justify-content-center">
+      <b-form v-if="show" @submit="onSubmit">
         <b-form-group
           id="input-group-1"
           label-for="input-1"
