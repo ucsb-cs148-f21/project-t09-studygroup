@@ -31,25 +31,26 @@
             </div> -->
 
         <div>
-          <b-row class="justify-content-center">
-            <h3 class="text-center">
+          <div style="display: inline-block; justify-content: center; position: relative; width: 100%">
+            <h3 style="padding-top: 5px; width: 30%; text-align: center; display: block; float: left; margin-left: 35%;">
               {{ courseID }}
             </h3>
-            <b-col>
-              <p class="text-center w-75">
-                {{ courseDiscription }}
-              </p>
-            </b-col>
-            <b-col>
-              <b-button v-b-toggle.sidebar-1>
-                See who's in the class
-              </b-button>
-              <b-col />
-            </b-col>
-          </b-row>
+            <b-dropdown
+              id="dropdown-right"
+              right
+              text="Actions"
+              style="width: 100px; display: block; float: right; padding-left: 5px; padding-right: 5px;"
+            >
+              <b-dropdown-item>Mode</b-dropdown-item>
+              <b-dropdown-item>Quit Class</b-dropdown-item>
+            </b-dropdown>
+            <b-button v-b-toggle.sidebar-1 style="width: 160px; display: block; float: right;">
+              View Classmates
+            </b-button>
+          </div>
           <b-sidebar
             id="sidebar-1"
-            title="Your companions"
+            title="Your Classmates"
             right
             shadow
           >
