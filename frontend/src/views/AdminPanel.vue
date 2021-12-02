@@ -1,6 +1,7 @@
 <template>
   <div class="adminpanel">
     <h1>Admin Panel</h1>
+    <p>When a new quarter begins, click this button to create new courses for the current quarter.</p>
     <b-button
       block
       variant="primary"
