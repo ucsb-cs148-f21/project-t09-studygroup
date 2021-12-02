@@ -19,15 +19,6 @@
           <b-nav-item to="/AdminPanel">
             AdminPanel
           </b-nav-item>
-          <b-nav-item @click="signout">
-            Signout
-          </b-nav-item>
-        </b-navbar-nav>
-        <!-- Right aligned nav items -->
-        <b-navbar-nav
-          v-if="isLoggedIn"
-          class="ms-auto"
-        >
           <b-nav-item>
             <b-nav-item-dropdown
               text="My classes"
@@ -43,6 +34,13 @@
               </li>
             </b-nav-item-dropdown>
           </b-nav-item>
+        </b-navbar-nav>
+        <!-- Right aligned nav items -->
+        <b-navbar-nav
+          v-if="isLoggedIn"
+          class="ms-auto"
+        >
+          <b-button size="sm" @click="signout" class="my-2 my-sm-0" variant="outline-primary">Signout</b-button>
           <b-nav-item to="/UserProfile">
             <b-img
               :src="`${photoURL}`"
