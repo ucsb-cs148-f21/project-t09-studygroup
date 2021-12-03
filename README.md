@@ -121,3 +121,6 @@ Replace "myFirstDatabase" with "studyapp" replace <password> with your password 
     Commit your changes: git commit -am 'Add some feature'
     Push to the branch: git push origin my-new-feature
     Submit a pull request :D
+
+# Deployment
+    https://cs-148-study-group.herokuapp.com
