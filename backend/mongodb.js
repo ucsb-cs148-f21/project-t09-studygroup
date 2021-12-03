@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { getMostCurrentQuarter } from './getMostCurrentQuarter';
+import { getMostCurrentQuarter } from './getMostCurrentQuarter.js';
 
 // Connection URL
 const url = process.env.MONGO_URL;

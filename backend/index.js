@@ -11,8 +11,8 @@ import { db, usersCollection } from './mongodb.js';
 import toAsyncApp from './asyncApp.js';
 
 import _ from './currentDirectory.cjs';
-import { getMostCurrentQuarter } from './getMostCurrentQuarter';
-import { getClasses } from './getClasses';
+import { getMostCurrentQuarter } from './getMostCurrentQuarter.js';
+import { getClasses } from './getClasses.js';
 
 const { DIRNAME } = _;
 
