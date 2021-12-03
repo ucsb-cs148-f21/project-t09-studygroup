@@ -88,3 +88,4 @@ public/static/
 .netrc.gpg
 public/docs/
 firebase_emulator_data/
+firebase-export-*/

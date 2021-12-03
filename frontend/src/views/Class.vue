@@ -14,7 +14,10 @@
             {{ courseDiscription }}
           </b-card-text>
           <b-row class="justify-content-center">
-            <b-button :disabled="joinButtonDisabled" @click="putUserInClass">
+            <b-button
+              :disabled="joinButtonDisabled"
+              @click="putUserInClass"
+            >
               Join
             </b-button>
           </b-row>
@@ -28,28 +31,47 @@
                 <button @click="addData" :disabled="updatingData">Add Data</button>
             </div> -->
 
-        <div>
-          <b-col class="justify-content-center">
-            <!-- <b-row class="justify-content-center"> -->
-            <h3 class="text-center">
+        <div style>
+          <div style="display: inline-block; justify-content: center; position: relative; width: 100%;">
+            <h3 style="padding-top: 5px; width: 30%; text-align: center; display: block; float: left; margin-left: 35%;">
               {{ courseID }}
             </h3>
-
-            <p class="text-center w-75">
-              {{ courseDiscription }}
-            </p>
-          </b-col>
-          <!-- </b-row> -->
-        </div>
-        <div>
-          <b-col>
-            <b-button v-b-toggle.sidebar-1> See who's in the class </b-button>
-          </b-col>
-
-          <b-sidebar id="sidebar-1" title="Your companions" right shadow>
+            <b-dropdown
+              id="dropdown-right"
+              right
+              text="Actions"
+              style="width: 100px; display: block; float: right; padding-left: 5px; padding-right: 5px;"
+            >
+              <b-dropdown-item @click="changeDisplayMode">
+                {{ displayTheme }}
+              </b-dropdown-item>
+              <b-dropdown-item @click="showModal">
+                Quit Class
+              </b-dropdown-item>
+            </b-dropdown>
+            <b-button
+              v-b-toggle.sidebar-1
+              shadow-none
+              style="width: 160px; display: block; float: right;"
+            >
+              View Classmates
+            </b-button>
+          </div>
+          <b-sidebar
+            id="sidebar-1"
+            title="Your Classmates"
+            right
+            shadow
+          >
             <div class="px-3 py-2">
-              <li v-for="students in userArray" :key="students.uid">
-                <b-card href="#" :title="students.name">
+              <li
+                v-for="students in userArray"
+                :key="students.uid"
+              >
+                <b-card
+                  href="#"
+                  :title="students.name"
+                >
                   <b-avatar
                     variant="info"
                     :src="students.picture"
@@ -64,15 +86,11 @@
 
         <div>
           <div>
-            <b-button
-              id="show-btn"
-              variant="outline-danger"
-              squared
-              @click="showModal"
+            <b-modal
+              ref="my-modal"
+              ok-title="Yes"
+              @ok="userWantToQuit"
             >
-              Quit Class
-            </b-button>
-            <b-modal ref="my-modal" ok-title="Yes" @ok="userWantToQuit">
               <div class="d-block text-center">
                 <h5>
                   Are you sure you want to quit? If you quit the class, you will
@@ -101,10 +119,10 @@
 </template>
 
 <script>
-import { roomsRef, usersRef, firebase } from "../firestore";
-import ChatContainer from "../ChatContainer.vue";
-import { axiosInstance } from "../utils/axiosInstance";
-import store from "../store/index";
+import { roomsRef, usersRef, firebase } from '../firestore';
+import ChatContainer from '../ChatContainer.vue';
+import { axiosInstance } from '../utils/axiosInstance';
+import store from '../store/index';
 
 export default {
   components: {
@@ -113,14 +131,15 @@ export default {
 
   data() {
     return {
-      theme: "light",
-      courseDiscription: "",
-      courseID: "",
+      theme: 'light',
+      courseDiscription: '',
+      courseID: '',
+      displayTheme: 'Dark Mode',
       joinButtonDisabled: false,
       isQuit: false,
       showChat: false,
       displayUserlist: false,
-      currentUserId: "",
+      currentUserId: '',
       isDevice: false,
       showDemoOptions: true,
       updatingData: false,
@@ -138,7 +157,7 @@ export default {
   },
   async mounted() {
     this.isDevice = window.innerWidth < 500;
-    window.addEventListener("resize", (ev) => {
+    window.addEventListener('resize', (ev) => {
       if (ev.isTrusted) this.isDevice = window.innerWidth < 500;
     });
     await this.initData(this.$route.params.id);
@@ -147,8 +166,8 @@ export default {
   },
   methods: {
     handleLeftChatRooms() {
-      this.$store.commit("deleteClass", this.$route.params.id);
-      this.$router.push({ path: "/home" });
+      this.$store.commit('deleteClass', this.$route.params.id);
+      this.$router.push({ path: '/home' });
     },
     async initData(classId) {
       console.log(classId);
@@ -165,24 +184,33 @@ export default {
           axiosInstance
             .get(`users/${el}`)
             .then((resp) => resp.data)
-            .catch(() => {})
+            .catch(() => {}),
         );
       });
       this.userArray = await Promise.all(this.userArray);
     },
     showModal() {
-      this.$refs["my-modal"].show();
+      this.$refs['my-modal'].show();
     },
     hideModal() {
-      this.$refs["my-modal"].hide();
+      this.$refs['my-modal'].hide();
+    },
+    changeDisplayMode() {
+      if (this.theme === 'light') {
+        this.displayTheme = 'Light Mode';
+        this.theme = 'dark';
+      } else {
+        this.displayTheme = 'Dark Mode';
+        this.theme = 'light';
+      }
     },
     async putUserInClass() {
       this.joinButtonDisabled = true;
       await axiosInstance.put(
         `class/${this.$route.params.id}/users`,
-        firebase.auth().currentUser.uid
+        firebase.auth().currentUser.uid,
       );
-      this.$store.commit("insertClass", this.classData);
+      this.$store.commit('insertClass', this.classData);
       this.isUserInClass = true;
       this.joinButtonDisabled = false;
     },
@@ -190,7 +218,7 @@ export default {
       this.isQuit = true;
       await axiosInstance.delete(
         `class/${this.$route.params.id}/users`,
-        firebase.auth().currentUser.uid
+        firebase.auth().currentUser.uid,
       );
     },
   },
