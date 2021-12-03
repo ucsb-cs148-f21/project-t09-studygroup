@@ -22,3 +22,6 @@
 | Fri 11/12 | Jennice Xu        | Final presentation leader                              |
 | Fri 11/12 | Joshua Avery      | Testing/QA coordinator                                 |
 | Fri 11/12 | Kenneth Wang      | User manual                                            |
+| Thu 12/02 | Anisha Kabir      | User manual                                            |
+| Thu 12/02 | Joshua Avery      | Design Document                                        |
+| Thu 12/02 | Joshua Avery      | Scrum Master                                           |
