@@ -100,6 +100,14 @@ app.post('/api/add-recent-classes', async (req, res) => {
       el.students = [];
       await db.collection(`courses_${quarter}`).insertOne(el);
     });
+    db.collection(`courses_${quarter}`).createIndex(
+      {
+        courseID: 'text',
+        title: 'text',
+        instructors: 'text',
+        description: 'text',
+      },
+    );
   }
   // db.collection(`courses_${quarter}`).deleteMany({});
   // (await getClasses(quarter)).forEach(async (el) => {
