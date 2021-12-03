@@ -1,16 +1,33 @@
 <template>
   <div>
-    <b-navbar toggleable="md" type="dark" variant="dark">
+    <b-navbar
+      toggleable="md"
+      type="dark"
+      variant="dark"
+    >
       <b-navbar-brand>UCSB Study Group</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse" />
-      <b-collapse id="nav-collapse" is-nav>
+      <b-collapse
+        id="nav-collapse"
+        is-nav
+      >
         <b-navbar-nav v-if="isLoggedIn">
-          <b-nav-item to="/home"> Home </b-nav-item>
-          <b-nav-item to="/AdminPanel"> AdminPanel </b-nav-item>
+          <b-nav-item to="/home">
+            Home
+          </b-nav-item>
+          <b-nav-item to="/AdminPanel">
+            AdminPanel
+          </b-nav-item>
 
-          <b-nav-item-dropdown text="My classes" right>
-            <li v-for="classes in getClasses" :key="classes._id">
+          <b-nav-item-dropdown
+            text="My classes"
+            right
+          >
+            <li
+              v-for="classes in getClasses"
+              :key="classes._id"
+            >
               <b-dropdown-item :to="`/class/${classes._id}`">
                 {{ classes.courseID }}
               </b-dropdown-item>
@@ -18,7 +35,10 @@
           </b-nav-item-dropdown>
         </b-navbar-nav>
         <!-- Right aligned nav items -->
-        <b-navbar-nav v-if="isLoggedIn" class="ms-auto">
+        <b-navbar-nav
+          v-if="isLoggedIn"
+          class="ms-auto"
+        >
           <b-button
             size="sm"
             class="my-2 my-sm-0"
@@ -44,13 +64,13 @@
 </template>
 
 <script>
-import { firebase } from "@/firestore";
-import { axiosInstance } from "./utils/axiosInstance";
+import { firebase } from '@/firestore';
+import { axiosInstance } from './utils/axiosInstance';
 
 export default {
   data() {
     return {
-      photoURL: "",
+      photoURL: '',
       isLoggedIn: false,
       myClasses: [],
       gotClasses: false,
@@ -68,10 +88,10 @@ export default {
         console.log(user);
         if (user !== null) {
           if (!this.gotClasses) {
-            const classArray = (await axiosInstance.get("users/getClasses"))
+            const classArray = (await axiosInstance.get('users/getClasses'))
               .data;
             classArray.forEach((el) => {
-              this.$store.commit("insertClass", el);
+              this.$store.commit('insertClass', el);
             });
             this.gotClasses = true;
           }
@@ -88,9 +108,9 @@ export default {
       this.isLoggedIn = true;
       this.photoURL = user.photoURL;
       if (!this.gotClasses) {
-        const classArray = (await axiosInstance.get("users/getClasses")).data;
+        const classArray = (await axiosInstance.get('users/getClasses')).data;
         classArray.forEach((el) => {
-          this.$store.commit("insertClass", el);
+          this.$store.commit('insertClass', el);
           console.log(this.getClasses);
         });
 

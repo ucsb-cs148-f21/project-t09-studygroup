@@ -1,4 +1,4 @@
-<!--Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth-->
+<!--Some of file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth-->
 
 <template>
   <div>
@@ -28,10 +28,10 @@
 </template>
 
 <script>
-import SocialLogin from "../components/SocialLogin.vue";
+import SocialLogin from '../components/SocialLogin.vue';
 
 export default {
-  name: "Login",
+  name: 'Login',
   components: {
     SocialLogin,
   },
