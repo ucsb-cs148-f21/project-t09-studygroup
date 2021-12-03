@@ -14,7 +14,7 @@
         @sliding-start="onSlideStart"
         @sliding-end="onSlideEnd"
       >
-        <b-carousel-slide caption="Welcome to UCSB study group 😊!">
+        <b-carousel-slide caption="Welcome!">
           <template #img>
             <img
               class="d-block img-fluid w-100"
@@ -24,11 +24,15 @@
               src="@/assets/lagoon.jpg"
             />
           </template>
+          <p>
+            <b
+              >In this page, you can search for classes you want to enroll in</b
+            >
+          </p>
         </b-carousel-slide>
 
         <b-carousel-slide
-          caption="In our UCSB study group website, you can look for study partners
-              in the class you enrolled in."
+          caption="When you are in the class, you can find who's in the class and invite them to your study group!"
         >
           <template #img>
             <img
