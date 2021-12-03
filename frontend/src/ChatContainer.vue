@@ -32,7 +32,7 @@
       @toggle-rooms-list="$emit('show-demo-options', $event.opened)"
     >
       <template v-slot:add-icon>
-        <b-button><b-icon-plus />Create chat room</b-button>
+        <b-button><b-icon-plus />Create</b-button>
       </template>
     </chat-window>
 
