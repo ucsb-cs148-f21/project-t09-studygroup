@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
-import Class from '../views/Class.vue';
-import Login from '../views/Login.vue';
-import AdminPanel from '../views/AdminPanel.vue';
-import UserProfile from '../views/UserProfile.vue';
 import { firebase } from '../firestore/index';
 
 Vue.use(VueRouter);
+
+const Class = () => import('../views/Class.vue');
+const Home = () => import('../views/Home.vue');
+const Login = () => import('../views/Login.vue');
+const AdminPanel = () => import('../views/AdminPanel.vue');
+const UserProfile = () => import('../views/UserProfile.vue');
 
 const routes = [
   {
