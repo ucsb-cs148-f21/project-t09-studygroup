@@ -1,60 +1,6 @@
 <template>
   <div>
-    <!--Carousel code copied and adapted from here https://bootstrap-vue.org/docs/components/carousel-->
-    <b-row class="justify-content-md-center">
-      <b-col cols="10">
-        <b-carousel
-          id="carousel-1"
-          v-model="slide"
-          :interval="4000"
-          controls
-          fade
-          background="#ababab"
-
-          style="text-shadow: 1px 1px 2px #333"
-          @sliding-start="onSlideStart"
-          @sliding-end="onSlideEnd"
-        >
-          <b-carousel-slide caption="Welcome to UCSB study group 😊!">
-            <template #img>
-              <img
-                class="d-block img-fluid w-100"
-                alt="image slot"
-
-                src="@/assets/lagoon.jpg"
-              >
-            </template>
-          </b-carousel-slide>
-
-          <b-carousel-slide
-            caption="In our UCSB study group website, you can look for study partners
-              in the class you enrolled in."
-          >
-            <template #img>
-              <img
-                class="d-block img-fluid w-100"
-                alt="image slot"
-
-                src="@/assets/sea.jpg"
-              >
-            </template>
-          </b-carousel-slide>
-
-          <b-carousel-slide
-            caption="Hope you have a wonderful study experience 🤩!"
-          >
-            <template #img>
-              <img
-                class="d-block img-fluid w-100"
-                alt="image slot"
-
-                src="@/assets/night.jpg"
-              >
-            </template>
-          </b-carousel-slide>
-        </b-carousel>
-      </b-col>
-    </b-row>
+   
     <b-row>
       <b-col cols="10">
         <div id="search-form">
