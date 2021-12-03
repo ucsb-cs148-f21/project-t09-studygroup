@@ -34,9 +34,9 @@
       @send-message-reaction="sendMessageReaction"
       @toggle-rooms-list="$emit('show-demo-options', $event.opened)"
     >
-      <!-- <template #room-header="{ room }">
-        {{ room.roomName }}
-      </template> -->
+      <template v-slot:add-icon>
+        <b-button><b-icon-plus />Create chat room</b-button>
+      </template>
     </chat-window>
 
     <b-modal
