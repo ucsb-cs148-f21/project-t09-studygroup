@@ -3,6 +3,7 @@
 <template>
   <div class="window-container" :class="{ 'window-mobile': isDevice }">
     <chat-window
+      :show-audio="false"
       :height="screenHeight"
       :theme="theme"
       :styles="styles"
@@ -113,30 +114,13 @@ export default {
       removeEnrollCode: null,
       removeUserId: "",
       removeUsers: [],
-      roomActions: [
-        { name: "inviteUser", title: "Invite User" },
-        { name: "removeUser", title: "Remove User" },
-        { name: "deleteRoom", title: "Delete Room" },
-        { name: "leaveRoom", title: "Leave Room" },
-      ],
-      menuActions: [
-        { name: "inviteUser", title: "Invite User" },
-        { name: "removeUser", title: "Remove User" },
-        { name: "deleteRoom", title: "Delete Room" },
-      ],
+      roomActions: [{ name: "leaveRoom", title: "Leave Room" }],
+      menuActions: [{ name: "leaveRoom", title: "Leave Room" }],
       styles: { container: { borderRadius: "4px" } },
       templatesText: [
         {
           tag: "help",
           text: "This is the help",
-        },
-        {
-          tag: "action",
-          text: "This is the action",
-        },
-        {
-          tag: "action 2",
-          text: "This is the second action",
         },
       ],
       // ,dbRequestCount: 0
@@ -575,12 +559,6 @@ export default {
 
     menuActionHandler({ action, roomId }) {
       switch (action.name) {
-        case "inviteUser":
-          return this.inviteUser(roomId);
-        case "removeUser":
-          return this.removeUser(roomId);
-        case "deleteRoom":
-          return this.deleteRoom(roomId);
         case "leaveRoom":
           return this.leaveRoom(roomId);
         default:
@@ -669,12 +647,6 @@ export default {
       this.$emit("leftRooms");
     },
 
-    // change needed
-    inviteUser(roomId) {
-      this.resetForms();
-      this.inviteEnrollCode = roomId;
-    },
-
     async addRoomUser() {
       this.disableForm = true;
 
@@ -690,46 +662,26 @@ export default {
       this.fetchRooms();
     },
 
-    removeUser(roomId) {
-      this.resetForms();
-      this.removeEnrollCode = roomId;
-      this.removeUsers = this.rooms.find(
-        (room) => room.roomId === roomId
-      ).users;
-    },
+    // async deleteRoom(roomId) {
+    //   const room = this.rooms.find((r) => r.roomId === roomId);
+    //   if (
+    //     room.users.find((user) => user._id === "SGmFnBZB4xxMv9V4CVlW") ||
+    //     room.users.find((user) => user._id === "6jMsIXUrBHBj7o2cRlau")
+    //   ) {
+    //     return alert("Nope, for demo purposes you cannot delete this room");
+    //   }
 
-    async deleteRoomUser() {
-      this.disableForm = true;
+    //   const ref = messagesRef(roomId);
 
-      await roomsRef.doc(this.removeEnrollCode).update({
-        users: firebase.firestore.FieldValue.arrayRemove(this.removeUserId),
-      });
+    //   ref.get().then((res) => {
+    //     if (res.empty) return;
+    //     res.docs.map((doc) => ref.doc(doc.id).delete());
+    //   });
 
-      this.removeEnrollCode = null;
-      this.removeUserId = "";
-      this.fetchRooms();
-    },
+    //   await roomsRef.doc(roomId).delete();
 
-    async deleteRoom(roomId) {
-      const room = this.rooms.find((r) => r.roomId === roomId);
-      if (
-        room.users.find((user) => user._id === "SGmFnBZB4xxMv9V4CVlW") ||
-        room.users.find((user) => user._id === "6jMsIXUrBHBj7o2cRlau")
-      ) {
-        return alert("Nope, for demo purposes you cannot delete this room");
-      }
-
-      const ref = messagesRef(roomId);
-
-      ref.get().then((res) => {
-        if (res.empty) return;
-        res.docs.map((doc) => ref.doc(doc.id).delete());
-      });
-
-      await roomsRef.doc(roomId).delete();
-
-      this.fetchRooms();
-    },
+    //   this.fetchRooms();
+    // },
 
     resetForms() {
       this.disableForm = false;
@@ -740,12 +692,6 @@ export default {
       this.removeEnrollCode = null;
       this.removeUserId = "";
     },
-
-    // ,incrementDbCounter(type, size) {
-    //   size = size || 1
-    //   this.dbRequestCount += size
-    //   console.log(type, size)
-    // }
   },
 };
 </script>

@@ -1,11 +1,8 @@
 <template>
-  <!-- <div
-    class="fixed-top d-flex align-items-center justify-content-center"
-  > -->
   <b-row class="justify-content-center">
     <b-col cols="6">
       <b-card
-        style="max-width: 100rem;"
+        style="max-width: 100rem"
         class="mt-5"
         img-height="500"
         img-width="500"
@@ -22,38 +19,26 @@
           </b-col>
         </b-row>
         <b-row class="justify-content-md-center">
-          <b-col
-            cols="5"
-            md="auto"
-          >
-            Username: {{ displayName }}
-          </b-col>
+          <b-col cols="5" md="auto"> Username: {{ displayName }} </b-col>
         </b-row>
         <b-row class="justify-content-md-center">
-          <b-col
-            cols="12"
-            md="auto"
-          >
-            Email: {{ email }}
-          </b-col>
+          <b-col cols="12" md="auto"> Email: {{ email }} </b-col>
         </b-row>
       </b-card>
     </b-col>
   </b-row>
-  <!-- </div> -->
-  <!-- </div> -->
 </template>
 
 <script>
-import { firebase } from '@/firestore';
+import { firebase } from "@/firestore";
 
 export default {
   data() {
     return {
-      displayName: '',
-      email: '',
+      displayName: "",
+      email: "",
       // remember to set photoURL to empty string
-      photoURL: '',
+      photoURL: "",
     };
   },
   mounted() {

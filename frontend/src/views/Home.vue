@@ -1,34 +1,91 @@
 <template>
   <div>
-    <div id="search-form">
-      <b-form v-if="show" @submit="onSubmit">
-        <b-form-group
-          id="input-group-1"
-          label-for="input-1"
-          description="Enter the course id or related terms you are searching for (e.g. ANTH 3)."
+    <div>
+      <b-carousel
+        id="carousel-1"
+        v-model="slide"
+        :interval="4000"
+        controls
+        fade
+        background="#ababab"
+        img-width="1024"
+        img-height="480"
+        style="text-shadow: 1px 1px 2px #333"
+        @sliding-start="onSlideStart"
+        @sliding-end="onSlideEnd"
+      >
+        <b-carousel-slide caption="Welcome to UCSB study group 😊!">
+          <template #img>
+            <img
+              class="d-block img-fluid w-100"
+              alt="image slot"
+              width="480"
+              height="1024"
+              src="@/assets/lagoon.jpg"
+            />
+          </template>
+        </b-carousel-slide>
+
+        <b-carousel-slide
+          caption="In our UCSB study group website, you can look for study partners
+              in the class you enrolled in."
         >
-          <b-form-input
-            id="input-1"
-            v-model="form.course"
-            placeholder="Search Course"
-            required
-          />
-        </b-form-group>
-        <b-button id="submit" type="submit" variant="primary">
-          Submit
-        </b-button>
-      </b-form>
-      <ul id="chat-room-links">
-        <li v-for="link in links" :key="link._id">
-          <router-link :to="`/class/${link._id}`">
-            {{ link.courseID }}
-          </router-link>
-          <p>
-            {{ link.description }}
-          </p>
-          <!-- <p v-html="link.message" /> -->
-        </li>
-      </ul>
+          <template #img>
+            <img
+              class="d-block img-fluid w-100"
+              alt="image slot"
+              width="480"
+              height="1024"
+              src="@/assets/sea.jpg"
+            />
+          </template>
+        </b-carousel-slide>
+
+        <b-carousel-slide
+          caption="Hope you have a wonderful study experience 🤩!"
+        >
+          <template #img>
+            <img
+              class="d-block img-fluid w-100"
+              alt="image slot"
+              width="480"
+              height="1024"
+              src="@/assets/night.jpg"
+            />
+          </template>
+        </b-carousel-slide>
+      </b-carousel>
+    </div>
+    <div id="search-form">
+      <b-row class="justify-content-center">
+        <b-form v-if="show" @submit="onSubmit">
+          <b-form-group
+            id="input-group-1"
+            label-for="input-1"
+            description="Enter the course id or related terms you are searching for (e.g. ANTH 3)."
+          >
+            <b-form-input
+              id="input-1"
+              v-model="form.course"
+              placeholder="Search Course"
+              required
+            />
+          </b-form-group>
+          <b-button id="submit" type="submit" variant="primary">
+            Submit
+          </b-button>
+        </b-form>
+        <ul id="chat-room-links">
+          <li v-for="link in links" :key="link._id">
+            <router-link :to="`/class/${link._id}`">
+              {{ link.courseID }}
+            </router-link>
+            <p>
+              {{ link.description }}
+            </p>
+          </li>
+        </ul>
+      </b-row>
     </div>
   </div>
 </template>
@@ -48,6 +105,8 @@ export default {
       titlemessage: "coursename: ",
       links: [],
       show: true,
+      slide: 0,
+      sliding: null,
     };
   },
   methods: {
@@ -60,28 +119,12 @@ export default {
       this.links = (
         await axiosInstance.get(`classes_search?course=${cname}`)
       ).data.results;
-      // const str = JSON.stringify(this.links, null, 2);
-      // console.log(str);
-      console.log(this.links);
-      // const courseLink = `${window.location.origin}/class/${this.info._id}`;
-      // async onSubmit(event) {
-      //   this.links = [];
-      //   event.preventDefault();
-      //   const searchText = this.course;
-
-      //   // search firebase for course
-      //   const q = query(collection(db, 'courses_20214'), where('courseID', '==', courseName));
-
-      //   const querySnapshot = await getDocs(q);
-      //   querySnapshot.forEach((doc) => {
-      //     console.log(doc.id, ' => ', doc.data());
-      //     const courseLink = `${window.location.origin}/class/${doc._id}`;
-      //     console.log(courseLink);
-      //     this.links.push({ message: `<a href='${courseLink}'>${courseLink}</a>` });
-      //   });
-      //   if (querySnapshot.empty) {
-      //     this.links.push({ message: '<p>Course Not Found</p>' });
-      //   }
+    },
+    onSlideStart() {
+      this.sliding = true;
+    },
+    onSlideEnd() {
+      this.sliding = false;
     },
   },
 };
