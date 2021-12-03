@@ -89,6 +89,7 @@ export default {
         console.log(user);
         if (user !== null) {
           if (!this.gotClasses) {
+            console.log(this.$route)
             const classArray = (await axiosInstance.get('users/getClasses'))
               .data;
             classArray.forEach((el) => {
@@ -102,22 +103,6 @@ export default {
       },
       deep: true,
     },
-  },
-  async mounted() {
-    const user = firebase.auth().currentUser;
-    if (user !== null) {
-      this.isLoggedIn = true;
-      this.photoURL = user.photoURL;
-      if (!this.gotClasses) {
-        const classArray = (await axiosInstance.get('users/getClasses')).data;
-        classArray.forEach((el) => {
-          this.$store.commit('insertClass', el);
-          console.log(this.getClasses);
-        });
-
-        this.gotClasses = true;
-      }
-    }
   },
   methods: {
     signout() {
