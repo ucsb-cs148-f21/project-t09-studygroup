@@ -1,11 +1,17 @@
 <!--Some code comes from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth and some from https://firebase.google.com/docs/auth/web/google-signin#web-version-8-->
 <template>
   <div class="signup-buttons">
-    <b-modal v-model="showFailureModal" ok-only>
+    <b-modal
+      v-model="showFailureModal"
+      ok-only
+    >
       Failed to sign in. Try again. Make sure that pop ups are unblocked.
     </b-modal>
     <div id="fb-root" />
-    <b-button class="google-signup" @click="loginWithGoogle">
+    <b-button
+      class="google-signup"
+      @click="loginWithGoogle"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
@@ -14,7 +20,10 @@
         aria-hidden="true"
       >
         <title>Sign in with Google</title>
-        <g fill="none" fill-rule="evenodd">
+        <g
+          fill="none"
+          fill-rule="evenodd"
+        >
           <path
             fill="#4285F4"
             d="M17.64 9.2045c0-.6381-.0573-1.2518-.1636-1.8409H9v3.4814h4.8436c-.2086 1.125-.8427 2.0782-1.7959 2.7164v2.2581h2.9087c1.7018-1.5668 2.6836-3.874 2.6836-6.615z"
@@ -39,11 +48,11 @@
 </template>
 
 <script>
-import axios from "axios";
-import { firebase } from "../firestore/index";
+import axios from 'axios';
+import { firebase } from '../firestore/index';
 
 export default {
-  name: "LoginSocial",
+  name: 'LoginSocial',
   data() {
     return {
       showFailureModal: false,
@@ -67,7 +76,7 @@ export default {
         this.showFailureModal = true;
         return;
       }
-      this.$router.push({ path: "/home" });
+      this.$router.push({ path: '/home' });
     },
   },
 };

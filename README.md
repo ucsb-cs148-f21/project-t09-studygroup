@@ -99,26 +99,21 @@ Replace "myFirstDatabase" with "studyapp" replace <password> with your password 
 7. push this to the linked branch on your heroku app
 
 # While developing
+`npm install` to get started
+
 `npm run serve` to start the frontend
     
 `npm run start:dev` to start the backend (with hot reloading!!)
     
-`firebase emulators:start` to start the firebase emulators
+`npm run firebase` to start the firebase emulators
     
 `npm run test:server` to run unit tests for the server
     
 # Functionality
 
-1. Go to <url>/adminpanel and click on refresh courses. This will load 20 of current quarter''s courses into your firebase.
+1. Go to <url>/adminpanel and click on refresh courses. This will load all of the current quarter's courses into your firebase.
 2. Go to <url>/ and search for a course by its I.D. (e.g. ANTH 3).
 3. Click on the given link and send messages to the chat. Now everyone on that course page can see your messages!
-
-# Known Problems
-Cannot upload files to chat.
-
-No username tracking for chat messages (yet!).
-    
-Voice chats are silent when sent in chat.
 # Contributing
 
     Fork it!

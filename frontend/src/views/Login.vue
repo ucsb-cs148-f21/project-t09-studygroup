@@ -1,4 +1,4 @@
-<!--Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth-->
+<!--Some of file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth-->
 
 <template>
   <div>
