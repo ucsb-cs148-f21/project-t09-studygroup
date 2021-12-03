@@ -1,11 +1,17 @@
 <template>
   <div class="adminpanel">
     <h1>Admin Panel</h1>
+    <p>When a new quarter begins, click this button to create new courses for the current quarter.</p>
     <b-button
       block
       variant="primary"
+      :disabled="isLoading"
       @click="getClasses()"
     >
+      <b-spinner
+        v-if="isLoading"
+        style="width: 1rem; height: 1rem;"
+      />
       Refresh Quarter
     </b-button>
   </div>
@@ -15,10 +21,17 @@
 import { axiosInstance } from '../utils/axiosInstance';
 
 export default {
+  data() {
+    return {
+      isLoading: false,
+    };
+  },
   methods: {
-    getClasses() {
+    async getClasses() {
       console.log(this.$API_BASE);
-      axiosInstance.post(`${this.$API_BASE}add-recent-classes`);
+      this.isLoading = true;
+      await axiosInstance.post(`${this.$API_BASE}add-recent-classes`);
+      this.isLoading = false;
     },
   },
 

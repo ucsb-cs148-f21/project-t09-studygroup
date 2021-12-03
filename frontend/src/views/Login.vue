@@ -1,26 +1,37 @@
 <!--Entire file is cited from https://github.com/Jebasuthan/Vue-Facebook-Google-oAuth-->
 
 <template>
-  <div
-    class="fixed-top d-flex align-items-center justify-content-center"
-    style="bottom: 0; overflow-y: auto"
-  >
-    <form>
-      <div class="box-container">
-        <h2 class="heading">
-          Sign In
-        </h2>
-        <SocialLogin />
-      </div>
-    </form>
+  <div>
+    <b-container>
+      <b-col class="justify-content-center">
+        <b-row class="justify-content-center">
+          <b-jumbotron
+            header="Welcome to UCSB study group 😊!"
+            header-level="3"
+            lead="Designed for better study experience"
+          >
+            <p>
+              In our UCSB study group website, you can look for study partners
+              in the class you enrolled in.
+            </p>
+            <p>Please sign in with UCSB account.</p>
+            <form>
+              <div class="box-container">
+                <SocialLogin />
+              </div>
+            </form>
+          </b-jumbotron>
+        </b-row>
+      </b-col>
+    </b-container>
   </div>
 </template>
 
 <script>
-import SocialLogin from '../components/SocialLogin.vue';
+import SocialLogin from "../components/SocialLogin.vue";
 
 export default {
-  name: 'Login',
+  name: "Login",
   components: {
     SocialLogin,
   },

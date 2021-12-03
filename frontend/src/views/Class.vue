@@ -14,7 +14,10 @@
             {{ courseDiscription }}
           </b-card-text>
           <b-row class="justify-content-center">
-            <b-button @click="putUserInClass">
+            <b-button
+              :disabled="joinButtonDisabled"
+              @click="putUserInClass"
+            >
               Join
             </b-button>
           </b-row>
@@ -22,9 +25,7 @@
       </b-row>
     </div>
     <div v-if="isUserInClass">
-      <div
-        class="app-container"
-      >
+      <div class="app-container">
         <!-- <div>
                 <button @click="resetData">Clear Data</button>
                 <button @click="addData" :disabled="updatingData">Add Data</button>
@@ -41,10 +42,18 @@
               text="Actions"
               style="width: 100px; display: block; float: right; padding-left: 5px; padding-right: 5px;"
             >
-              <b-dropdown-item @click="changeDisplayMode"> {{ displayTheme }} </b-dropdown-item>
-              <b-dropdown-item @click="showModal">Quit Class</b-dropdown-item>
+              <b-dropdown-item @click="changeDisplayMode">
+                {{ displayTheme }}
+              </b-dropdown-item>
+              <b-dropdown-item @click="showModal">
+                Quit Class
+              </b-dropdown-item>
             </b-dropdown>
-            <b-button shadow-none v-b-toggle.sidebar-1 style="width: 160px; display: block; float: right;">
+            <b-button
+              v-b-toggle.sidebar-1
+              shadow-none
+              style="width: 160px; display: block; float: right;"
+            >
               View Classmates
             </b-button>
           </div>
@@ -74,6 +83,7 @@
             </div>
           </b-sidebar>
         </div>
+
         <div>
           <div>
             <b-modal
@@ -82,19 +92,23 @@
               @ok="userWantToQuit"
             >
               <div class="d-block text-center">
-                <h5> Are you sure you want to quit? If you quit the class, you will also quit all the chat rooms in this class</h5>
+                <h5>
+                  Are you sure you want to quit? If you quit the class, you will
+                  also quit all the chat rooms in this class
+                </h5>
               </div>
             </b-modal>
           </div>
           <chat-container
             v-if="showChat"
             :key="$route.params.id"
+            :is-quit="isQuit"
             :current-user-id="currentUserId"
             :theme="theme"
             :is-device="isDevice"
             @show-demo-options="showDemoOptions = $event"
+            @leftRooms="handleLeftChatRooms"
           />
-
           <!-- <div class="version-container">
                 v1.0.0
             </div> -->
@@ -118,9 +132,11 @@ export default {
   data() {
     return {
       theme: 'light',
-      displayTheme: 'Dark Mode',
       courseDiscription: '',
       courseID: '',
+      displayTheme: 'Dark Mode',
+      joinButtonDisabled: false,
+      isQuit: false,
       showChat: false,
       displayUserlist: false,
       currentUserId: '',
@@ -129,7 +145,6 @@ export default {
       updatingData: false,
       isUserInClass: false,
       isLoaded: false,
-      wantQuit: false,
       classData: {},
       userArray: [],
     };
@@ -150,20 +165,27 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    handleLeftChatRooms() {
+      this.$store.commit('deleteClass', this.$route.params.id);
+      this.$router.push({ path: '/home' });
+    },
     async initData(classId) {
       console.log(classId);
       this.currentUserId = firebase.auth().currentUser.uid;
       console.log(firebase.auth().currentUser);
-      this.classData = (
-        await axiosInstance.get(`class/${classId}`)
-      ).data;
+      this.classData = (await axiosInstance.get(`class/${classId}`)).data;
       this.isUserInClass = this.classData.students.includes(this.currentUserId);
       this.courseID = this.classData.courseID;
       this.courseDiscription = this.classData.description;
 
       const uidArray = this.classData.students;
       uidArray.forEach(async (el) => {
-        this.userArray.push((axiosInstance.get(`users/${el}`)).then((resp) => resp.data));
+        this.userArray.push(
+          axiosInstance
+            .get(`users/${el}`)
+            .then((resp) => resp.data)
+            .catch(() => {}),
+        );
       });
       this.userArray = await Promise.all(this.userArray);
     },
@@ -177,36 +199,39 @@ export default {
       if (this.theme === 'light') {
         this.displayTheme = 'Light Mode';
         this.theme = 'dark';
-      }
-      else {
+      } else {
         this.displayTheme = 'Dark Mode';
         this.theme = 'light';
       }
     },
     async putUserInClass() {
+      this.joinButtonDisabled = true;
       await axiosInstance.put(
         `class/${this.$route.params.id}/users`,
         firebase.auth().currentUser.uid,
       );
       this.$store.commit('insertClass', this.classData);
       this.isUserInClass = true;
+      this.joinButtonDisabled = false;
     },
     async userWantToQuit() {
-      this.wantQuit = true;
-      await axiosInstance.delete(`class/${this.$route.params.id}/users`, firebase.auth().currentUser.uid);
-      this.isUserInClass = false;
+      this.isQuit = true;
+      await axiosInstance.delete(
+        `class/${this.$route.params.id}/users`,
+        firebase.auth().currentUser.uid,
+      );
     },
   },
-  /* watch: {
-    currentUserId() {
-      this.showChat = false;
-      setTimeout(() => (this.showChat = true), 150);
-    },
-  }, */
+  // watch: {
+  //   currentUserId() {
+  //     this.showChat = false;
+  //     setTimeout(() => (this.showChat = true), 150);
+  //   },
+  // },
   async beforeRouteUpdate(to, from, next) {
     this.showChat = false;
     this.isLoaded = false;
-    await this.initData(to.params.id)
+    await this.initData(to.params.id);
     next();
     this.showChat = true;
     this.isLoaded = true;

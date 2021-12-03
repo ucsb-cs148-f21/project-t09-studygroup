@@ -4,25 +4,27 @@
   > -->
   <b-row class="justify-content-center">
     <b-card
-      img-src="https://demos.creative-tim.com/argon-dashboard-pro/assets/img/theme/img-1-1000x600.jpg"
-      style="max-width: 70rem;"
+      img-src="https://images.unsplash.com/photo-1487088678257-3a541e6e3922?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2274&q=80"
+      style="max-width: 100rem;"
+      img-height="500"
+      img-width="500"
     >
       <div class="card-img-overlay d-flex align-items-center justify-content-center">
         <b-img
           :src="photoURL"
           rounded="circle"
           alt="Circle image"
-          height="200"
-          width="200"
+          height="150"
+          width="150"
         />
       </div>
-      <div class="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4 font-weight-regular">
-        <h3>
-          {{ displayName }}
-        </h3>
-        <h5>
-          <div>{{ email }}</div>
-        </h5>
+      <div class="text-center border-10 pt-8 pt-md-4 pb-0 pb-md-4 font-weight-regular justify-content-center">
+        <b-row class="justify-content-md-center">
+          <b-col cols="12" md="auto">Username: {{displayName}}</b-col>
+        </b-row>
+        <b-row class="justify-content-md-center">
+          <b-col cols="12" md="auto">Email: {{email}}</b-col>
+        </b-row>
       </div>
     </b-card>
   </b-row>

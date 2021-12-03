@@ -1,10 +1,7 @@
 <!-- Almost all of this code copied from demo folder here: https://github.com/antoine92190/vue-advanced-chat-->
 
 <template>
-  <div
-    class="window-container"
-    :class="{ 'window-mobile': isDevice }"
-  >
+  <div class="window-container" :class="{ 'window-mobile': isDevice }">
     <chat-window
       :height="screenHeight"
       :theme="theme"
@@ -38,28 +35,21 @@
       </template> -->
     </chat-window>
 
-    <b-modal
-      v-model="showAddRoomModal"
-      ok-only
-      ok-title="Cancel"
-    >
+    <b-modal v-model="showAddRoomModal" ok-only ok-title="Cancel">
       <add-users @create-room="addRoom" />
     </b-modal>
 
-    <b-modal
-      v-model="chatRoomCreationError"
-      ok-only
-    >
+    <b-modal v-model="chatRoomCreationError" ok-only>
       Unexpected error creating chat room.
     </b-modal>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import { doc, getDoc } from 'firebase/firestore';
-import ChatWindow, { Rooms } from 'vue-advanced-chat';
-import AddUsers from './components/AddUsers.vue';
+import axios from "axios";
+import { doc, getDoc } from "firebase/firestore";
+import ChatWindow, { Rooms } from "vue-advanced-chat";
+import AddUsers from "./components/AddUsers.vue";
 import {
   db,
   firebase,
@@ -67,26 +57,27 @@ import {
   messagesRef,
   usersRef,
   deleteDbField,
-} from '@/firestore';
-import { parseTimestamp, isSameDay } from '@/utils/dates';
+} from "@/firestore";
+import { parseTimestamp, isSameDay } from "@/utils/dates";
 // import ChatWindow from 'vue-advanced-chat'
-import 'vue-advanced-chat/dist/vue-advanced-chat.css';
-import { axiosInstance } from './utils/axiosInstance';
+import "vue-advanced-chat/dist/vue-advanced-chat.css";
+import { axiosInstance } from "./utils/axiosInstance";
 // import ChatWindow from './../../dist/vue-advanced-chat.umd.min.js'
 
 export default {
   components: {
     ChatWindow,
-    'add-users': AddUsers,
+    "add-users": AddUsers,
   },
 
   props: {
     currentUserId: { type: String, required: true },
     theme: { type: String, required: true },
     isDevice: { type: Boolean, required: true },
+    isQuit: { type: Boolean, required: true },
   },
 
-  emits: ['show-demo-options'],
+  emits: ["show-demo-options"],
 
   data() {
     return {
@@ -96,7 +87,7 @@ export default {
 
       roomsPerPage: 15,
       rooms: [],
-      roomId: '',
+      roomId: "",
       startRooms: null,
       endRooms: null,
       roomsLoaded: false,
@@ -108,56 +99,63 @@ export default {
       messagesPerPage: 20,
       messages: [],
       messagesLoaded: false,
-      roomMessage: '',
+      roomMessage: "",
       startMessages: null,
       endMessages: null,
       roomsListeners: [],
       listeners: [],
-      typingMessageCache: '',
+      typingMessageCache: "",
       disableForm: false,
       addNewRoom: null,
-      addRoomUsername: '',
+      addRoomUsername: "",
       inviteEnrollCode: null,
-      invitedUsername: '',
+      invitedUsername: "",
       removeEnrollCode: null,
-      removeUserId: '',
+      removeUserId: "",
       removeUsers: [],
       roomActions: [
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
-        { name: 'leaveRoom', title: 'Leave Room' },
+        { name: "inviteUser", title: "Invite User" },
+        { name: "removeUser", title: "Remove User" },
+        { name: "deleteRoom", title: "Delete Room" },
+        { name: "leaveRoom", title: "Leave Room" },
       ],
       menuActions: [
-        { name: 'inviteUser', title: 'Invite User' },
-        { name: 'removeUser', title: 'Remove User' },
-        { name: 'deleteRoom', title: 'Delete Room' },
+        { name: "inviteUser", title: "Invite User" },
+        { name: "removeUser", title: "Remove User" },
+        { name: "deleteRoom", title: "Delete Room" },
       ],
-      styles: { container: { borderRadius: '4px' } },
+      styles: { container: { borderRadius: "4px" } },
       templatesText: [
         {
-          tag: 'help',
-          text: 'This is the help',
+          tag: "help",
+          text: "This is the help",
         },
         {
-          tag: 'action',
-          text: 'This is the action',
+          tag: "action",
+          text: "This is the action",
         },
         {
-          tag: 'action 2',
-          text: 'This is the second action',
+          tag: "action 2",
+          text: "This is the second action",
         },
       ],
       // ,dbRequestCount: 0
     };
   },
-
   computed: {
     loadedRooms() {
       return this.rooms.slice(0, this.roomsLoadedCount);
     },
     screenHeight() {
-      return this.isDevice ? `${window.innerHeight}px` : 'calc(100vh - 80px)';
+      return this.isDevice ? `${window.innerHeight}px` : "calc(100vh - 80px)";
+    },
+  },
+  watch: {
+    isQuit: {
+      immediate: true,
+      handler(newVal, old) {
+        if (old === false && newVal === true) this.leaveAllRoom();
+      },
     },
   },
 
@@ -195,7 +193,7 @@ export default {
     },
 
     resetMessages() {
-      console.log('resetMessages');
+      console.log("resetMessages");
       this.messages = [];
       this.messagesLoaded = false;
       this.startMessages = null;
@@ -213,9 +211,9 @@ export default {
       if (this.endRooms && !this.startRooms) return (this.roomsLoaded = true);
       console.log(this.currentUserId);
       let query = roomsRef
-        .where('users', 'array-contains', this.currentUserId)
-        .where('classId', '==', this.$route.params.id)
-        .orderBy('lastUpdated', 'desc')
+        .where("users", "array-contains", this.currentUserId)
+        .where("classId", "==", this.$route.params.id)
+        .orderBy("lastUpdated", "desc")
         .limit(this.roomsPerPage);
 
       if (this.startRooms) query = query.startAfter(this.startRooms);
@@ -242,14 +240,16 @@ export default {
       // this.incrementDbCounter('Fetch Room Users', roomUserIds.length)
       let rawUsers = [];
       roomUserIds.forEach((userId) => {
-        if (userId === 'removed') return;
+        if (userId === "removed") return;
         const promise = this.getUser(userId);
 
         rawUsers.push(promise);
       });
       rawUsers = await Promise.all(rawUsers);
       // eslint-disable-next-line no-param-reassign
-      rawUsers.forEach((elem) => { elem.username = elem.name; });
+      rawUsers.forEach((elem) => {
+        elem.username = elem.name;
+      });
       this.allUsers = [...this.allUsers, ...rawUsers];
 
       const roomList = {};
@@ -258,7 +258,8 @@ export default {
 
         room.data().users.forEach((userId) => {
           const foundUser = this.allUsers.find((user) => user?.uid === userId);
-          if (userId === 'removed') roomList[room.id].users.push({ username: '', _id: '' });
+          if (userId === "removed")
+            roomList[room.id].users.push({ username: "", _id: "" });
           if (foundUser) roomList[room.id].users.push(foundUser);
         });
       });
@@ -269,14 +270,19 @@ export default {
         const room = roomList[key];
 
         const roomContacts = room.users.filter(
-          (user) => user.uid !== this.currentUserId,
+          (user) => user.uid !== this.currentUserId
         );
 
-        room.roomName = roomContacts.map((user) => user.username).filter((name) => name !== '').join(', ') || 'Myself';
+        room.roomName =
+          roomContacts
+            .map((user) => user.username)
+            .filter((name) => name !== "")
+            .join(", ") || "Myself";
 
-        const roomAvatar = roomContacts.length === 1 && roomContacts[0].avatar
-          ? roomContacts[0].avatar
-          : require('@/assets/logo.png');
+        const roomAvatar =
+          roomContacts.length === 1 && roomContacts[0].avatar
+            ? roomContacts[0].avatar
+            : require("@/assets/logo.png");
 
         formattedRooms.push({
           ...room,
@@ -284,10 +290,10 @@ export default {
           avatar: roomAvatar,
           index: room.lastUpdated?.seconds,
           lastMessage: {
-            content: 'Room created',
+            content: "Room created",
             timestamp: this.formatTimestamp(
               new Date(room.lastUpdated?.seconds),
-              room.lastUpdated,
+              room.lastUpdated
             ),
           },
         });
@@ -307,14 +313,14 @@ export default {
 
     listenLastMessage(room) {
       const listener = messagesRef(room.roomId)
-        .orderBy('timestamp', 'desc')
+        .orderBy("timestamp", "desc")
         .limit(1)
         .onSnapshot((messages) => {
           // this.incrementDbCounter('Listen Last Room Message', messages.size)
           messages.forEach((message) => {
             const lastMessage = this.formatLastMessage(message.data());
             const roomIndex = this.rooms.findIndex(
-              (r) => room.roomId === r.roomId,
+              (r) => room.roomId === r.roomId
             );
             this.rooms[roomIndex].lastMessage = lastMessage;
             console.log(lastMessage);
@@ -344,28 +350,28 @@ export default {
           content,
           timestamp: this.formatTimestamp(
             new Date(message.timestamp.seconds * 1000),
-            message.timestamp,
+            message.timestamp
           ),
           distributed: true,
           seen: message.sender_id === this.currentUserId ? message.seen : null,
           new:
-            message.sender_id !== this.currentUserId
-            && (!message.seen || !message.seen[this.currentUserId]),
+            message.sender_id !== this.currentUserId &&
+            (!message.seen || !message.seen[this.currentUserId]),
         },
       };
     },
 
     formatTimestamp(date, timestamp) {
       const timestampFormat = isSameDay(date, new Date())
-        ? 'HH:mm'
-        : 'DD/MM/YY';
+        ? "HH:mm"
+        : "DD/MM/YY";
       const result = parseTimestamp(timestamp, timestampFormat);
-      return timestampFormat === 'HH:mm' ? `Today, ${result}` : result;
+      return timestampFormat === "HH:mm" ? `Today, ${result}` : result;
     },
 
     async fetchMessages({ room, options = {} }) {
       console.log(options);
-      this.$emit('show-demo-options', false);
+      this.$emit("show-demo-options", false);
 
       if (options.reset) {
         this.resetMessages();
@@ -378,7 +384,7 @@ export default {
 
       const ref = messagesRef(room.roomId);
 
-      let query = ref.orderBy('timestamp', 'desc').limit(this.messagesPerPage);
+      let query = ref.orderBy("timestamp", "desc").limit(this.messagesPerPage);
 
       if (this.startMessages) query = query.startAfter(this.startMessages);
 
@@ -395,7 +401,7 @@ export default {
       if (this.startMessages) this.endMessages = this.startMessages;
       this.startMessages = messages.docs[messages.docs.length - 1];
 
-      let listenerQuery = ref.orderBy('timestamp');
+      let listenerQuery = ref.orderBy("timestamp");
 
       if (this.startMessages) {
         listenerQuery = listenerQuery.startAt(this.startMessages);
@@ -423,7 +429,9 @@ export default {
       messages.forEach(async (message) => {
         const formattedMessage = await this.formatMessage(room, message);
         // eslint-disable-next-line no-underscore-dangle
-        const messageIndex = this.messages.findIndex((m) => m._id === message.id);
+        const messageIndex = this.messages.findIndex(
+          (m) => m._id === message.id
+        );
 
         if (messageIndex === -1) {
           this.messages = this.messages.concat([formattedMessage]);
@@ -438,8 +446,8 @@ export default {
 
     markMessagesSeen(room, message) {
       if (
-        message.data().sender_id !== this.currentUserId
-        && (!message.data().seen || !message.data().seen[this.currentUserId])
+        message.data().sender_id !== this.currentUserId &&
+        (!message.data().seen || !message.data().seen[this.currentUserId])
       ) {
         messagesRef(room.roomId)
           .doc(message.id)
@@ -460,8 +468,8 @@ export default {
           senderId: message.data().sender_id,
           _id: message.id,
           seconds: timestamp.seconds,
-          timestamp: parseTimestamp(timestamp, 'HH:mm'),
-          date: parseTimestamp(timestamp, 'DD MMMM YYYY'),
+          timestamp: parseTimestamp(timestamp, "HH:mm"),
+          date: parseTimestamp(timestamp, "DD MMMM YYYY"),
           username: senderUser ? senderUser.name : null,
           // avatar: senderUser ? senderUser.avatar : null,
           distributed: true,
@@ -480,9 +488,7 @@ export default {
       return formattedMessage;
     },
 
-    async sendMessage({
-      content, roomId, replyMessage,
-    }) {
+    async sendMessage({ content, roomId, replyMessage }) {
       const message = {
         sender_id: this.currentUserId,
         content,
@@ -502,15 +508,11 @@ export default {
       roomsRef.doc(roomId).update({ lastUpdated: new Date() });
     },
 
-    async editMessage({
-      messageId, newContent, roomId,
-    }) {
+    async editMessage({ messageId, newContent, roomId }) {
       const newMessage = { edited: new Date() };
       newMessage.content = newContent;
 
-      await messagesRef(roomId)
-        .doc(messageId)
-        .update(newMessage);
+      await messagesRef(roomId).doc(messageId).update(newMessage);
     },
 
     async deleteMessage({ message, roomId }) {
@@ -527,8 +529,8 @@ export default {
           const userId1 = room.users[0]._id;
           const userId2 = room.users[1]._id;
           if (
-            (userId1 === user._id || userId1 === this.currentUserId)
-            && (userId2 === user._id || userId2 === this.currentUserId)
+            (userId1 === user._id || userId1 === this.currentUserId) &&
+            (userId2 === user._id || userId2 === this.currentUserId)
           ) {
             roomId = room.roomId;
           }
@@ -538,7 +540,7 @@ export default {
       if (roomId) return (this.roomId = roomId);
 
       const query1 = await roomsRef
-        .where('users', '==', [this.currentUserId, user._id])
+        .where("users", "==", [this.currentUserId, user._id])
         .get();
 
       if (!query1.empty) {
@@ -546,7 +548,7 @@ export default {
       }
 
       const query2 = await roomsRef
-        .where('users', '==', [user._id, this.currentUserId])
+        .where("users", "==", [user._id, this.currentUserId])
         .get();
 
       if (!query2.empty) {
@@ -573,21 +575,19 @@ export default {
 
     menuActionHandler({ action, roomId }) {
       switch (action.name) {
-        case 'inviteUser':
+        case "inviteUser":
           return this.inviteUser(roomId);
-        case 'removeUser':
+        case "removeUser":
           return this.removeUser(roomId);
-        case 'deleteRoom':
+        case "deleteRoom":
           return this.deleteRoom(roomId);
-        case 'leaveRoom':
+        case "leaveRoom":
           return this.leaveRoom(roomId);
         default:
       }
     },
 
-    async sendMessageReaction({
-      reaction, remove, messageId, roomId,
-    }) {
+    async sendMessageReaction({ reaction, remove, messageId, roomId }) {
       const dbAction = remove
         ? firebase.firestore.FieldValue.arrayRemove(this.currentUserId)
         : firebase.firestore.FieldValue.arrayUnion(this.currentUserId);
@@ -638,7 +638,7 @@ export default {
     async addRoom(uidArray) {
       uidArray.push(this.currentUserId);
       try {
-        await db.collection('chatRooms').add({
+        await db.collection("chatRooms").add({
           classId: this.$route.params.id,
           lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
           users: uidArray,
@@ -655,9 +655,18 @@ export default {
         users: firebase.firestore.FieldValue.arrayRemove(this.currentUserId),
       });
       await roomsRef.doc(roomID).update({
-        users: firebase.firestore.FieldValue.arrayUnion('removed'),
+        users: firebase.firestore.FieldValue.arrayUnion("removed"),
       });
       this.fetchRooms();
+    },
+
+    async leaveAllRoom() {
+      const leavePromises = [];
+      this.rooms.forEach((room) =>
+        leavePromises.push(this.leaveRoom(room.roomId).catch(() => {}))
+      );
+      await Promise.all(leavePromises);
+      this.$emit("leftRooms");
     },
 
     // change needed
@@ -677,7 +686,7 @@ export default {
         .update({ users: firebase.firestore.FieldValue.arrayUnion(id) });
 
       this.inviteEnrollCode = null;
-      this.invitedUsername = '';
+      this.invitedUsername = "";
       this.fetchRooms();
     },
 
@@ -685,7 +694,7 @@ export default {
       this.resetForms();
       this.removeEnrollCode = roomId;
       this.removeUsers = this.rooms.find(
-        (room) => room.roomId === roomId,
+        (room) => room.roomId === roomId
       ).users;
     },
 
@@ -697,17 +706,17 @@ export default {
       });
 
       this.removeEnrollCode = null;
-      this.removeUserId = '';
+      this.removeUserId = "";
       this.fetchRooms();
     },
 
     async deleteRoom(roomId) {
       const room = this.rooms.find((r) => r.roomId === roomId);
       if (
-        room.users.find((user) => user._id === 'SGmFnBZB4xxMv9V4CVlW')
-        || room.users.find((user) => user._id === '6jMsIXUrBHBj7o2cRlau')
+        room.users.find((user) => user._id === "SGmFnBZB4xxMv9V4CVlW") ||
+        room.users.find((user) => user._id === "6jMsIXUrBHBj7o2cRlau")
       ) {
-        return alert('Nope, for demo purposes you cannot delete this room');
+        return alert("Nope, for demo purposes you cannot delete this room");
       }
 
       const ref = messagesRef(roomId);
@@ -725,11 +734,11 @@ export default {
     resetForms() {
       this.disableForm = false;
       this.addNewRoom = null;
-      this.addRoomUsername = '';
+      this.addRoomUsername = "";
       this.inviteEnrollCode = null;
-      this.invitedUsername = '';
+      this.invitedUsername = "";
       this.removeEnrollCode = null;
-      this.removeUserId = '';
+      this.removeUserId = "";
     },
 
     // ,incrementDbCounter(type, size) {
