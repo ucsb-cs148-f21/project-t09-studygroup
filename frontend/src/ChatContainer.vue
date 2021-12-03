@@ -566,13 +566,21 @@ export default {
     async listenRooms(query) {
       const listener = query.onSnapshot((rooms) => {
         // this.incrementDbCounter('Listen Rooms Typing Users', rooms.size)
+        let counter = 0;
+        if (this.showAddRoomModal === true) return;
         rooms.forEach((room) => {
+          counter += 1;
           const foundRoom = this.rooms.find((r) => r.roomId === room.id);
           if (foundRoom) {
             foundRoom.typingUsers = room.data().typingUsers;
             foundRoom.index = room.data().lastUpdated.seconds;
           }
         });
+        if (counter !== this.rooms.length) {
+          this.fetchRooms();
+          return;
+        }
+        counter = 0;
       });
       this.roomsListeners.push(listener);
     },
@@ -585,14 +593,15 @@ export default {
           lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
           users: uidArray,
         });
-        this.showAddRoomModal = false;
         this.fetchRooms();
+        this.showAddRoomModal = false;
       } catch (e) {
         console.log(e);
         this.chatRoomCreationError = true;
       }
     },
     async leaveRoom(roomID) {
+      this.resetRooms();
       await roomsRef.doc(roomID).update({
         users: firebase.firestore.FieldValue.arrayRemove(this.currentUserId),
       });
