@@ -62,6 +62,9 @@ export default {
     async loginWithGoogle() {
       try {
         const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({
+          hd: 'ucsb.edu',
+        });
         await firebase.auth().signInWithPopup(provider);
       } catch (e) {
         console.log(e);
