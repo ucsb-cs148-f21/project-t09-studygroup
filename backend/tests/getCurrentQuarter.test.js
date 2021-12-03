@@ -1,7 +1,8 @@
 import supertest from 'supertest';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import { app, getMostCurrentQuarter } from '../index.js';
+import { app} from '../index.js';
+import {getMostCurrentQuarter} from '../getMostCurrentQuarter.js';
 
 jest.mock('axios');
 jest.mock('../mongodb.js');
