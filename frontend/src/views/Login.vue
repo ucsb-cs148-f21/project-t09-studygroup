@@ -28,10 +28,10 @@
 </template>
 
 <script>
-import SocialLogin from "../components/SocialLogin.vue";
+import SocialLogin from '../components/SocialLogin.vue';
 
 export default {
-  name: "Login",
+  name: 'Login',
   components: {
     SocialLogin,
   },
