@@ -40,7 +40,7 @@ service cloud.firestore {
   }
 }
   ```
-12. Click on the Indexes tab and then put in collection ID, 'chatRooms'. Put in a field name `users` and then select Arrays. Put in a second field name `lastUpdated` and then select Descending. Choose Collection as your query scope. Click "Create Index."
+12. Click on the Indexes tab and then put in collection ID, 'chatRooms'. Put in a field name `users` and then select Arrays. Put in a second field name called `classId` and select ascending. Put in a third field name `lastUpdated` and then select Descending. Choose Collection as your query scope. Click "Create Index."
 13. Click on the gear next to "Project Overview." Go to the "Service Accounts" tab. Click on "Generate New Private Key." Copy the contents of this file and put it in an env var in heroku called: FIREBASE_CONFIG.
 14. Go back to Project Overview and click on the `</>` symbol. Type in a nickname for your web app. click "register app." Copy only the firebase config object. Go to this website: https://www.convertsimple.com/convert-javascript-to-json/ and convert it to JSON. (Don't worry this info will be public anyway so there's no risk of revealing it to anyone) and paste it into an environment variable called "VUE_APP_FIREBASE_CONFIG."
 
@@ -48,5 +48,5 @@ service cloud.firestore {
 1. Click "Deploy Branch" in the bottom of the deploy tab of heroku for your app.
 2. Sign in with a ucsb account.
 3. Go to AdminPanel and click on refresh quarter. This will load all the current classes into the database. 
-4. Search for a class using the search bar and join it.
+4. Search for a class using the search bar and join it. Check the console for any errors. If there are no errors you are good. If it has a message that states: "Uncaught (in promise) FirebaseError: The query requires an index. You can create it here: <url>" then simply click on that url and make sure to switch accounts to the one that owns the firebase instance. Click "Create" and wait for the index to finish building.
 5. Have a few others sign in and join the same class. Then you can test out the chat room creation by searching for your friends and adding them in a chat room.
