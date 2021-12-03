@@ -23,6 +23,7 @@
           <b-nav-item-dropdown
             text="My classes"
             right
+            :disabled="getClasses.length === 0"
           >
             <li
               v-for="classes in getClasses"
