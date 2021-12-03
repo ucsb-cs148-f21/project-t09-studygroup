@@ -1,11 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import axios from 'axios';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
 // import { firestore } from './firestore.js';
 import { initializeApp, cert } from 'firebase-admin/app';
-import { FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
 import { ObjectId } from 'mongodb';
@@ -13,7 +11,8 @@ import { db, usersCollection } from './mongodb.js';
 import toAsyncApp from './asyncApp.js';
 
 import _ from './currentDirectory.cjs';
-import { validateChatRoomBody } from './validations.js';
+import { getMostCurrentQuarter } from './getMostCurrentQuarter';
+import { getClasses } from './getClasses';
 
 const { DIRNAME } = _;
 
@@ -29,8 +28,6 @@ if (process.env.FIREBASE_AUTH_EMULATOR_HOST !== undefined) {
     ),
   });
 }
-
-const firestore = getFirestore();
 const app = toAsyncApp(express());
 
 // allow cross-origin requests for development
@@ -39,7 +36,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const AUTH_ENDPOINT = '/api/auth';
-const CLASS_ENDPOINT = '/api/classes_search';
 
 app.use(express.json());
 
@@ -65,109 +61,16 @@ app.use(async (req, res, next) => {
   }
 });
 
-// const login = express();
-// build multiple CRUD interfaces:
-// TODO: 1. get the most current quarter using another axios request
-// 2. use the quarter in the getclass function
-// 3. go through that data and take out few things that we want
-// 4. courseID, course instructor, etc.
-// 5. put each in its own json documents
-// 6. learn how to store that into firebase
-// 7. make the Vue admin button to send request to this add-recent-classes
-
-async function getClasses(quarter) {
-  const pageSize = 300;
-  let listOfClasses = [];
-  let classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=1&pageSize=${pageSize}&includeClassSections=true`, {
-
-    headers: {
-      accept: 'application/json',
-      'ucsb-api-version': '1.0',
-      'ucsb-api-key': process.env.UCSB_API_KEY,
-    },
-  });
-  const totalNumber = classesinfo.data.total;
-  const totalCourses = parseInt(totalNumber, 10);
-  let page = 1;
-  classesinfo = classesinfo.data;
-  let courseInfo = classesinfo.classes.map((item) => {
-    const instructorList = [];
-
-    item.classSections.forEach((element) => {
-      element.instructors.forEach((ele) => {
-        if (ele.functionCode === 'Teaching and in charge') {
-          instructorList.push(ele.instructor);
-        }
-      });
-      // if (element.instructors.functionCode === "Teaching and in charge") {
-      //   instructorList.push(element.instructors.instructor);
-
-      // }
-    });
-    let courseID = item.courseId;
-    courseID = courseID.replace(/\s+/g, ' ').trim();
-    const { title } = item;
-    const { description } = item;
-
-    return {
-      courseID,
-      title,
-      instructors: instructorList,
-      description,
-    };
-  });
-  listOfClasses = listOfClasses.concat(courseInfo);
-  while (pageSize * page < totalCourses) {
-    page += 1;
-    // eslint-disable-next-line no-await-in-loop
-    classesinfo = await axios.get(`https://api.ucsb.edu/academics/curriculums/v1/classes/search?quarter=${quarter}&pageNumber=${page}&pageSize=${pageSize}&includeClassSections=true`, {
-
-      headers: {
-        accept: 'application/json',
-        'ucsb-api-version': '1.0',
-        'ucsb-api-key': process.env.UCSB_API_KEY,
-      },
-    });
-    classesinfo = classesinfo.data;
-    courseInfo = classesinfo.classes.map((item) => {
-      const instructorList = [];
-      item.classSections.forEach((element) => {
-        element.instructors.forEach((ele) => {
-          if (ele.functionCode === 'Teaching and in charge') {
-            instructorList.push(ele.instructor);
-          }
-        });
-        // if (element.instructors.functionCode === "Teaching and in charge") {
-        //   instructorList.push(element.instructors.instructor);
-        // }
-      });
-      let courseID = item.courseId;
-      courseID = courseID.replace(/\s+/g, ' ').trim();
-      const { title } = item;
-      const { description } = item;
-
-      return {
-        courseID,
-        title,
-        instructors: instructorList,
-        description,
-      };
-    });
-    listOfClasses = listOfClasses.concat(courseInfo);
-  }
-  return listOfClasses;
+async function getClassByOid(Oid) {
+  const quarter = await getMostCurrentQuarter();
+  console.log(new ObjectId(Oid));
+  return db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(Oid) });
 }
-export async function getMostCurrentQuarter() {
-  const qinfo = await axios.get('https://api.ucsb.edu/academics/quartercalendar/v1/quarters/current', {
 
-    headers: {
-      accept: 'application/json',
-      'ucsb-api-version': '1.0',
-      'ucsb-api-key': process.env.UCSB_API_KEY,
-    },
-  });
-
-  return qinfo.data.quarter;
+async function replaceClassByOid(Oid, obj) {
+  const quarter = await getMostCurrentQuarter();
+  console.log(new ObjectId(Oid));
+  await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(Oid) }, obj);
 }
 
 app.post(AUTH_ENDPOINT, async (req, res) => {
@@ -210,20 +113,18 @@ app.post('/api/add-recent-classes', async (req, res) => {
 });
 
 app.get('/api/class/:classID', async (req, res) => {
-  const quarter = await getMostCurrentQuarter();
-  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  const classObj = await getClassByOid(req.params.classID);
   if (classObj !== null) { return res.send(classObj); }
   return res.sendStatus(404);
 });
 
 app.put('/api/class/:classID/users', async (req, res) => {
   const decodedToken = req.user;
-  const quarter = await getMostCurrentQuarter();
-  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  const classObj = await getClassByOid(req.params.classID);
   const userUID = decodedToken.uid;
   if (classObj === null) { return res.sendStatus(404); }
   classObj.students.push(userUID);
-  await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(req.params.classID) }, classObj);
+  await replaceClassByOid(req.params.classID, classObj);
   const user = await db.collection('users').findOne({ uid: userUID });
   if (user.classes === undefined) {
     user.classes = [];
@@ -235,14 +136,13 @@ app.put('/api/class/:classID/users', async (req, res) => {
 
 app.delete('/api/class/:classID/users', async (req, res) => {
   const decodedToken = req.user;
-  const quarter = await getMostCurrentQuarter();
-  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  const classObj = await getClassByOid(req.params.classID);
   const userUID = decodedToken.uid;
   const user = await db.collection('users').findOne({ uid: userUID });
   if (classObj === null) { return res.sendStatus(404); }
   if (user === null) { return res.sendStatus(404); }
   classObj.students = classObj.students.filter((element) => element !== decodedToken.uid);
-  await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(req.params.classID) }, classObj);
+  await replaceClassByOid(req.params.classID, classObj);
   user.classes = user.classes.filter((element) => element !== req.params.classID);
   await db.collection('users').replaceOne({ uid: userUID }, user);
   return res.send(200);
@@ -265,19 +165,14 @@ app.get('/api/classes_search', async (req, res) => {
 
 app.get('/api/class/:classID/user_search', async (req, res) => {
   const { searchText } = req.query;
-  const quarter = await getMostCurrentQuarter();
-  const classObj = await db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(req.params.classID) });
+  const classObj = await getClassByOid(req.params.classID);
   const results = await db.collection('users').find({ uid: { $in: classObj.students, $ne: req.user.uid }, $text: { $search: searchText } }, { score: { $meta: 'textScore' } }).sort({ score: { $meta: 'textScore' } }).toArray();
   res.send({ results: results.slice(0, 10) }); // returns the top 5 most relevant courses
 });
 
 
 
-async function getClassByOid(Oid) {
-  const quarter = await getMostCurrentQuarter();
-  console.log(new ObjectId(Oid));
-  return db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(Oid) });
-}
+
 app.get('/api/users/getClasses', async (req, res) => {
   const decodedToken = req.user;
   const userUID = decodedToken.uid;
@@ -302,23 +197,6 @@ app.get('/api/users/:userUID', async (req, res) => {
   if (user === null) return res.sendStatus(404);
   return res.send(user);
 });
-/* app.post('/api/class/:classId/chat_rooms', async (req, res) => {
-  if (validateChatRoomBody(req) === false) return res.sendStatus(422);
-  const { classId } = req.params;
-  const classObj = await getClassByOid(classId);
-  if (classObj === null) return res.status(404).send({ error: 'class_not_found' });
-
-  const isUserListValid = req.body.users.every((userId) => classObj.students.includes(userId));
-
-  if (isUserListValid === false) return res.status(409).send({ error: 'user_not_in_class' });
-  const ref = await firestore.doc(`chatRooms/${uuidv4()}`);
-  await ref.update({
-    classId,
-    lastUpdated: FieldValue.serverTimestamp(),
-    users: req.body.users,
-  });
-  res.sendStatus(200);
-}); */
 
 app.use('/', express.static(path.join(path.dirname(DIRNAME), '/dist')));
 app.get('/*', (req, res) => {
