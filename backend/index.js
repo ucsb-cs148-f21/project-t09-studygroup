@@ -62,13 +62,13 @@ app.use(async (req, res, next) => {
 });
 
 async function getClassByOid(Oid) {
-  const quarter = await getMostCurrentQuarter();
+  const quarter = "20214";
   console.log(new ObjectId(Oid));
   return db.collection(`courses_${quarter}`).findOne({ _id: ObjectId(Oid) });
 }
 
 async function replaceClassByOid(Oid, obj) {
-  const quarter = await getMostCurrentQuarter();
+  const quarter = "20214";
   console.log(new ObjectId(Oid));
   await db.collection(`courses_${quarter}`).replaceOne({ _id: ObjectId(Oid) }, obj);
 }
@@ -92,7 +92,7 @@ app.post(AUTH_ENDPOINT, async (req, res) => {
 });
 
 app.post('/api/add-recent-classes', async (req, res) => {
-  const quarter = await getMostCurrentQuarter();
+  const quarter = "20214";
 
   // Check collection exists before re writing over classes
   if ((await db.collection(`courses_${quarter}`).findOne({})) === null) {
@@ -165,7 +165,7 @@ app.get('/api/currentQuarter', async (req, res) => {
 app.get('/api/classes_search', async (req, res) => {
   const { course } = req.query;
   console.log(`QUERY CLASS:    ${course}`);
-  const quarter = await getMostCurrentQuarter();
+  const quarter = await "20214";
   const results = await db.collection(`courses_${quarter}`).find({ $text: { $search: course } },
     { score: { $meta: 'textScore' }, courseID: 1, title: 1 }).sort({ score: { $meta: 'textScore' } }).toArray();
   res.send({ results: results.slice(0, 5) }); // returns the top 5 most relevant courses
