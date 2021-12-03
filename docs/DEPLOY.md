@@ -48,5 +48,5 @@ service cloud.firestore {
 1. Click "Deploy Branch" in the bottom of the deploy tab of heroku for your app.
 2. Sign in with a ucsb account.
 3. Go to AdminPanel and click on refresh quarter. This will load all the current classes into the database. 
-4. Search for a class using the search bar and join it. Check the console for any errors. If there are no errors you are good. If it has a message that states: "Uncaught (in promise) FirebaseError: The query requires an index. You can create it here: <url>" then simply click on that url and make sure to switch accounts to the one that owns the firebase instance. Click "Create" and wait for the index to finish building.
+4. Search for a class using the search bar and join it. Check the console for any errors. If there are no errors you are good. If it has a message that states: "Uncaught (in promise) FirebaseError: The query requires an index. You can create it here: \<url\>" then simply click on that url and make sure to switch accounts to the one that owns the firebase instance. Click "Create" and wait for the index to finish building.
 5. Have a few others sign in and join the same class. Then you can test out the chat room creation by searching for your friends and adding them in a chat room.
