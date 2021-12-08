@@ -15,3 +15,14 @@ The main contributions I made can be seen in the pull requests I linked below:
 [Chat Room UI Improvements](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/79)
 
 [More Chat Room UI Improvements](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/85)
+
+### Kenneth
+For the app, I mainly worked on the Admin Panel and its features. I worked on the UI and adding functionality to the refresh quarter button by getting the current quarter from the UCSB Gold API, pulling the courses for that quarter from another API, and storing it into Mongo DB. I also added a loading display so while the courses are being loaded, the button is deactivated and shows that it is loading.
+
+Pull Requests:
+
+[Admin Panel UI](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/27)
+
+[Pull All Courses From UCSB API](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/46)
+
+[Admin Panel Button Loading](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/84)
