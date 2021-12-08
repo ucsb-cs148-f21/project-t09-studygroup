@@ -9,7 +9,7 @@ The main contributions I made can be seen in the pull requests I linked below:
 
 [Search Functionality](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/58)
 
-[Search Endpoint Use](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/71) (also see corresponding [issue](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/64))
+[Search Results Display](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/71) (also see corresponding [issue](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/64))
 
 [Chat Room UI Improvements](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/79)
 
