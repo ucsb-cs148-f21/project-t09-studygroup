@@ -37,17 +37,14 @@ let the search page function correcting in the frontend. In the end, I focused o
 
 The main contributions I made can be seen in the pull requests I linked below:
 
-[Figure out how ways for getting access to UCSB API](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/13)
-
 [Store courses into firebase](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/23)
 
 [Navigation Bar](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/48)
 
 [Rebuild the search page to fit MongoDB & new backend functions](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/64)
 
-[Make the search page looks better](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/40)
-
-[Make the sign-in page look better and also improve the user profile & navigation bar](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/56)
+[Make the search page &](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/40)
+[user profile & navigation bar looks better](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/56)
 
 # Jamie Wang
 
