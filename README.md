@@ -89,6 +89,9 @@ supertest is used to test http servers
 
 nodemon is used for hot module reloading when developing
 
+# Code folder hierarchy
+This is explained in much more detail in our design document.
+
 # Development
 ## Prerequisites
 
