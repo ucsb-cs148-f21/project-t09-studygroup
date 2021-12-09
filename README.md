@@ -15,6 +15,7 @@ Our tech stack will be vue, mongodb, and fastapi. Joshua is familiar with using 
 
 Our project is meant to make it easy for people to find the same classes and then communicate with people in those classes. We will have a central repository through which people can search for classes and the join. People should be able to chat with others. Professors can claim the class if they want so they can also communicate with their students. Finally TAs should be able to join as well.
 
+# Or goals at the beginning of the quarter (Not all of them are achieved)
 
 Professor
 - Manage their class
@@ -42,25 +43,12 @@ Administrator
 
 We will restrict the userbase to @ucsb.edu
 
-[Deployment](./docs/Deploy.md)
 
 
 
-# Installation
-Prerequisites
 
-User should have npm, node, and git installed. Do this through nvm (Node Version Manager). They should also have the firebase-cli installed for development.
 
-### Set up firebase
-Make sure firebase CLI is installed:
-
-`curl -sL firebase.tools | bash`
-
-Start the emulators:
-
-`firebase emulators:start`
 # Dependencies
-LOTS of credit to vue-advanced-chat for giving us demo files we could put in our project and adapt.
 
 axios is a library that makes sending http requests with js easy.
 
@@ -87,18 +75,17 @@ vuex is meant for storing state in vue
 Eslint allows for checking of style in code
 
 vue-cli-service is a binary for easily serving, building, and prototyping vue code
-# Installation Steps
 
-1. Pull this from the repo
-2. Go here and make an account: https://www.mongodb.com/try
-3. Make a mongodb cluster. Allow all ip addresses to connect. Create a user. Go to connect your application and create a connection url.
-Replace "myFirstDatabase" with "studyapp" replace <password> with your password for that user of the database. Copy and paste the connection url into a .env file in the root folder. `MONGO_URL=<url_here>` This file should model "sample.env" DO NOT COMMIT TO GITHUB OR REVEAL THIS TO ANYONE BUT YOURSELF. 
-4. Make a firebase project and replace this config with your own config
-5. Make a heroku app
-6. Link your heroku app with your own github repo
-7. push this to the linked branch on your heroku app
+# Development
+## Prerequisites
 
-# While developing
+User should have npm, node, and git installed. Do this through nvm (Node Version Manager). They should also have the firebase-cli installed for development.
+
+Make sure firebase CLI is installed:
+
+`curl -sL firebase.tools | bash`
+
+## While developing
 `npm install` to get started
 
 `npm run serve` to start the frontend
@@ -109,11 +96,7 @@ Replace "myFirstDatabase" with "studyapp" replace <password> with your password 
     
 `npm run test:server` to run unit tests for the server
     
-# Functionality
 
-1. Go to <url>/adminpanel and click on refresh courses. This will load all of the current quarter's courses into your firebase.
-2. Go to <url>/ and search for a course by its I.D. (e.g. ANTH 3).
-3. Click on the given link and send messages to the chat. Now everyone on that course page can see your messages!
 # Contributing
 
     Fork it!
@@ -126,4 +109,4 @@ Replace "myFirstDatabase" with "studyapp" replace <password> with your password 
     https://cs-148-study-group.herokuapp.com
     
 # Deployment instructions
-    https://github.com/ucsb-cs148-f21/project-t09-studygroup/blob/main/docs/DEPLOY.md
+    [Deployment](./docs/Deploy.md)
