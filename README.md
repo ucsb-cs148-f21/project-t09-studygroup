@@ -109,4 +109,4 @@ Make sure firebase CLI is installed:
  https://cs-148-study-group.herokuapp.com
     
 # Deployment instructions
- [Deployment](./docs/Deploy.md)
+ [Deployment](./docs/DEPLOY.md)
