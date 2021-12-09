@@ -39,4 +39,4 @@ I also prototyped google sign in, did classroom drop down, user profile, sign ou
 In addition to doing coding I also did the deployment of the MVP, wrote the final deployment instructions, and deployed the final product. 
 I also know a lot about these technologies and so helped people when they were stuck coding, or explained to them the basic steps of how they would want to go about coding certain things.
 
-One of my big coding contributions, among other things, was designing the search for users: https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/70/files
+One of my big coding contributions, among other things, was designing the search for users to invite on the frontend: https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/70/files
