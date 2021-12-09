@@ -106,7 +106,7 @@ Make sure firebase CLI is installed:
     Submit a pull request :D
 
 # Deployment
-    https://cs-148-study-group.herokuapp.com
+ https://cs-148-study-group.herokuapp.com
     
 # Deployment instructions
-    [Deployment](./docs/Deploy.md)
+ [Deployment](./docs/Deploy.md)
