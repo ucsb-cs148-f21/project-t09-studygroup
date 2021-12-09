@@ -26,3 +26,12 @@ Pull Requests:
 [Pull All Courses From UCSB API](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/46)
 
 [Admin Panel Button Loading](https://github.com/ucsb-cs148-f21/project-t09-studygroup/pull/84)
+
+
+# Jamie Wang
+
+Joshua and I prototyped the chat room.
+
+I also prototyped google sign in, did classroom drop down, user profile, sign out, quit class, view classmates sidebar. I did lots of these with the help of Joshua.
+
+
