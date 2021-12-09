@@ -124,3 +124,6 @@ Replace "myFirstDatabase" with "studyapp" replace <password> with your password 
 
 # Deployment
     https://cs-148-study-group.herokuapp.com
+    
+# Deployment instructions
+    https://github.com/ucsb-cs148-f21/project-t09-studygroup/blob/main/docs/DEPLOY.md
