@@ -17,3 +17,4 @@ The main contributions I made can be seen in the pull requests I linked below:
 [Make the search page looks better](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/40)
 
 [Make the sign-in page look better and also improve the user profile & navigation bar](https://github.com/ucsb-cs148-f21/project-t09-studygroup/issues/56)
+
